@@ -221,6 +221,11 @@ main.content::before {
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1.5em;
+  /* The overlapping negative margins between images can push the last image
+     on a wrapped line a few px past the row's own edge on narrow screens,
+     leaking onto the page background - clip that spillover here. */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 #heroes .post-content img {
@@ -270,6 +275,11 @@ main.content::before {
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1.5em;
+  /* The overlapping negative margins between images can push the last image
+     on a wrapped line a few px past the row's own edge on narrow screens,
+     leaking onto the page background - clip that spillover here. */
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 #enemies .post-content img {
