@@ -1,3 +1,39 @@
+/* ===== Liquid wave divider between sections =====
+   Replaces the theme's plain CSS-border triangle (theme.scss .post-after)
+   with a wavy, dripping shape that spills from the bottom of one section
+   onto the top of the next. The SVG path itself lives in the project-level
+   layouts/_default/index.html override; this just resets the theme's
+   border-triangle box model and positions/colors the SVG. Using
+   var(--color-background) instead of a hardcoded color means light/dark
+   alternation keeps working automatically, since that variable is already
+   re-scoped inside .post-holder.dark. */
+.post-holder .post-after,
+.post-holder.dark .post-after {
+  left: 0;
+  right: 0;
+  width: 100%;
+  /* Kept shallow (45px above/below the section boundary on both sides) so
+     the drips never reach as far as the next section's heading - that sits
+     ~84px below the boundary (.post-holder padding-top + .post padding-top)
+     and the previous section's own text ends ~64px above it
+     (.post padding-bottom). */
+  height: 90px;
+  bottom: -45px;
+  border: none;
+  border-radius: 0;
+  color: var(--color-background);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.post-after-wave {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.15));
+}
+
 /* Custom Color Palette - overrides theme's own CSS variables */
 :root {
   /* Cover / landing area */
@@ -119,12 +155,19 @@ a.fn-item {
    blobs or runs off the edge of the page, and smaller pustules dot the strands
    between them. It's one absolutely-positioned layer spanning the full page height
    (z-index:1, below the text at z-index:2), so it visually runs underneath the
-   content the whole way down instead of resetting at every section. */
+   content the whole way down instead of resetting at every section.
+
+   Deliberately a ::after (not ::before): both this overlay and .post-after's
+   liquid wave sit at z-index:1, so which one wins is decided by document
+   order among equal z-index siblings. As ::after it paints later than every
+   .post-holder (including its .post-after wave), so it tints the wave with
+   the same multiply blend as it does section backgrounds - otherwise the
+   wave would sit "outside" the overlay and read as a flat, untinted patch. */
 main.content {
   position: relative;
 }
 
-main.content::before {
+main.content::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -143,7 +186,7 @@ main.content::before {
    extreme aspect ratio leaves it too sparse to read as covering the page, so
    instead scale it to the viewport width and repeat it vertically. */
 @media only screen and (max-width: 768px) {
-  main.content::before {
+  main.content::after {
     background-repeat: repeat-y;
     background-size: 100% auto;
   }
