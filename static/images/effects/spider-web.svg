@@ -32,6 +32,124 @@
     <g id="smallPustule">
       <path d="M0,-22 C12,-23 22,-13 22,-1 C22,11 12,22 0,22 C-12,22 -22,11 -22,-1 C-22,-13 -12,-22 0,-22 Z" fill="url(#blobSmall)"/>
     </g>
+
+    <style>
+      @media (prefers-reduced-motion: no-preference) {
+        .blob-pulse {
+          animation-name: blobPulse;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          transform-box: view-box;
+          transform-origin: 0 0;
+        }
+        .pustule-pulse {
+          animation-name: pustulePulse;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+          transform-box: view-box;
+          transform-origin: 0 0;
+        }
+        @keyframes blobPulse {
+          0%, 100% { transform: scale(var(--s, 1)); }
+          50% { transform: scale(calc(var(--s, 1) * 1.06)); }
+        }
+        @keyframes pustulePulse {
+          0%, 100% { transform: scale(var(--s, 1)); }
+          50% { transform: scale(calc(var(--s, 1) * 1.14)); }
+        }
+        @keyframes strandWiggle1 {
+      0%, 100% { d: path("M150,300 C350,320 480,420 620,480"); }
+      50% { d: path("M150,300 C340.7,344.3 485.6,405.4 620,480"); }
+    }
+    #strand-1 { animation: strandWiggle1 3.90s ease-in-out 0.35s infinite; }
+        @keyframes strandWiggle2 {
+      0%, 100% { d: path("M620,480 C700,560 760,650 800,730"); }
+      50% { d: path("M620,480 C675.7,577.5 774.6,639.5 800,730"); }
+    }
+    #strand-2 { animation: strandWiggle2 4.40s ease-in-out 0.70s infinite; }
+        @keyframes strandWiggle3 {
+      0%, 100% { d: path("M800,730 C815,780 822,840 830,900"); }
+      50% { d: path("M800,730 C797.1,783.2 832.8,838.1 830,900"); }
+    }
+    #strand-3 { animation: strandWiggle3 4.90s ease-in-out 1.05s infinite; }
+        @keyframes strandWiggle4 {
+      0%, 100% { d: path("M830,900 C740,1000 600,1080 500,1180"); }
+      50% { d: path("M830,900 C724.9,982.2 609.1,1090.7 500,1180"); }
+    }
+    #strand-4 { animation: strandWiggle4 5.40s ease-in-out 1.40s infinite; }
+        @keyframes strandWiggle5 {
+      0%, 100% { d: path("M500,1180 C450,1300 400,1400 360,1480"); }
+      50% { d: path("M500,1180 C433.5,1292.3 409.9,1404.6 360,1480"); }
+    }
+    #strand-5 { animation: strandWiggle5 5.90s ease-in-out 0.00s infinite; }
+        @keyframes strandWiggle6 {
+      0%, 100% { d: path("M360,1480 C340,1540 320,1590 300,1650"); }
+      50% { d: path("M360,1480 C311.7,1530 337,1596 300,1650"); }
+    }
+    #strand-6 { animation: strandWiggle6 3.40s ease-in-out 0.35s infinite; }
+        @keyframes strandWiggle7 {
+      0%, 100% { d: path("M300,1650 C480,1780 700,1880 880,1980"); }
+      50% { d: path("M300,1650 C465.9,1804.9 708.5,1865.1 880,1980"); }
+    }
+    #strand-7 { animation: strandWiggle7 3.90s ease-in-out 0.70s infinite; }
+        @keyframes strandWiggle8 {
+      0%, 100% { d: path("M880,1980 C860,2080 830,2160 800,2220"); }
+      50% { d: path("M880,1980 C831.5,2070.5 847.1,2165.7 800,2220"); }
+    }
+    #strand-8 { animation: strandWiggle8 4.40s ease-in-out 1.05s infinite; }
+        @keyframes strandWiggle9 {
+      0%, 100% { d: path("M800,2220 C780,2260 765,2280 750,2300"); }
+      50% { d: path("M800,2220 C762.4,2249 775.6,2286.6 750,2300"); }
+    }
+    #strand-9 { animation: strandWiggle9 4.90s ease-in-out 1.40s infinite; }
+        @keyframes strandWiggle10 {
+      0%, 100% { d: path("M750,2300 C550,2450 250,2580 90,2680"); }
+      50% { d: path("M750,2300 C537,2427.5 257.8,2593.5 90,2680"); }
+    }
+    #strand-10 { animation: strandWiggle10 5.40s ease-in-out 0.00s infinite; }
+        @keyframes strandWiggle11 {
+      0%, 100% { d: path("M90,2680 C110,2850 150,2980 200,3100"); }
+      50% { d: path("M90,2680 C81,2857.6 167.4,2975.4 200,3100"); }
+    }
+    #strand-11 { animation: strandWiggle11 5.90s ease-in-out 0.35s infinite; }
+        @keyframes strandWiggle12 {
+      0%, 100% { d: path("M200,3100 C350,3220 520,3320 650,3380"); }
+      50% { d: path("M200,3100 C337.6,3239.9 527.4,3308.1 650,3380"); }
+    }
+    #strand-12 { animation: strandWiggle12 3.40s ease-in-out 0.70s infinite; }
+        @keyframes strandWiggle13 {
+      0%, 100% { d: path("M150,300 C100,180 60,60 -60,-90"); }
+      50% { d: path("M150,300 C118.3,170.1 49,65.9 -60,-90"); }
+    }
+    #strand-13 { animation: strandWiggle13 3.90s ease-in-out 1.05s infinite; }
+        @keyframes strandWiggle14 {
+      0%, 100% { d: path("M830,900 C920,850 980,820 1080,760"); }
+      50% { d: path("M830,900 C932.7,872.7 972.4,806.4 1080,760"); }
+    }
+    #strand-14 { animation: strandWiggle14 4.40s ease-in-out 1.40s infinite; }
+        @keyframes strandWiggle15 {
+      0%, 100% { d: path("M500,1180 C380,1220 250,1250 -70,1300"); }
+      50% { d: path("M500,1180 C376.3,1202.2 252.2,1260.7 -70,1300"); }
+    }
+    #strand-15 { animation: strandWiggle15 4.90s ease-in-out 0.00s infinite; }
+        @keyframes strandWiggle16 {
+      0%, 100% { d: path("M750,2300 C880,2250 960,2220 1080,2160"); }
+      50% { d: path("M750,2300 C890.2,2273.9 953.9,2205.6 1080,2160"); }
+    }
+    #strand-16 { animation: strandWiggle16 5.40s ease-in-out 0.35s infinite; }
+        @keyframes strandWiggle17 {
+      0%, 100% { d: path("M90,2680 C10,2820 -60,2950 -140,3120"); }
+      50% { d: path("M90,2680 C-16.6,2806.1 -44,2958.3 -140,3120"); }
+    }
+    #strand-17 { animation: strandWiggle17 5.90s ease-in-out 0.70s infinite; }
+        @keyframes strandWiggle18 {
+      0%, 100% { d: path("M200,3100 C280,3270 380,3430 520,3660"); }
+      50% { d: path("M200,3100 C261.9,3280.3 390.8,3423.8 520,3660"); }
+    }
+    #strand-18 { animation: strandWiggle18 3.40s ease-in-out 1.05s infinite; }
+        
+      }
+    </style>
   </defs>
 
   <!-- === strands: wide connective-tissue bands (round caps, generous width) between
@@ -40,80 +158,122 @@
        the stretched membrane, like the reference image) === -->
 
   <!-- B1 -> M1 -->
-  <path d="M150,300 C350,320 480,420 620,480" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <path id="strand-1" class="strand-wiggle" d="M150,300 C350,320 480,420 620,480" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
   <ellipse cx="385" cy="390" rx="11" ry="5" fill="#FFFFFF" transform="rotate(21 385 390)"/>
   <!-- M1 -> B2, tapered: thick belly then a thin pinched neck -->
-  <path d="M620,480 C700,560 760,650 800,730" fill="none" stroke="url(#strandGrad)" stroke-width="30" stroke-linecap="round"/>
+  <path id="strand-2" class="strand-wiggle" d="M620,480 C700,560 760,650 800,730" fill="none" stroke="url(#strandGrad)" stroke-width="30" stroke-linecap="round"/>
   <ellipse cx="710" cy="605" rx="17" ry="7" fill="#FFFFFF" transform="rotate(54 710 605)"/>
-  <path d="M800,730 C815,780 822,840 830,900" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <path id="strand-3" class="strand-wiggle" d="M800,730 C815,780 822,840 830,900" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
   <ellipse cx="815" cy="815" rx="8" ry="3" fill="#FFFFFF" transform="rotate(80 815 815)"/>
 
   <!-- B2 -> M2 -->
-  <path d="M830,900 C740,1000 600,1080 500,1180" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
+  <path id="strand-4" class="strand-wiggle" d="M830,900 C740,1000 600,1080 500,1180" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
   <ellipse cx="665" cy="1040" rx="10" ry="4" fill="#FFFFFF" transform="rotate(140 665 1040)"/>
   <!-- M2 -> B3, tapered: thin pinch then bulge -->
-  <path d="M500,1180 C450,1300 400,1400 360,1480" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <path id="strand-5" class="strand-wiggle" d="M500,1180 C450,1300 400,1400 360,1480" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
   <ellipse cx="430" cy="1330" rx="8" ry="3" fill="#FFFFFF" transform="rotate(115 430 1330)"/>
-  <path d="M360,1480 C340,1540 320,1590 300,1650" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
+  <path id="strand-6" class="strand-wiggle" d="M360,1480 C340,1540 320,1590 300,1650" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
   <ellipse cx="330" cy="1565" rx="14" ry="6" fill="#FFFFFF" transform="rotate(109 330 1565)"/>
 
   <!-- B3 -> M3 -->
-  <path d="M300,1650 C480,1780 700,1880 880,1980" fill="none" stroke="url(#strandGrad)" stroke-width="22" stroke-linecap="round"/>
+  <path id="strand-7" class="strand-wiggle" d="M300,1650 C480,1780 700,1880 880,1980" fill="none" stroke="url(#strandGrad)" stroke-width="22" stroke-linecap="round"/>
   <ellipse cx="590" cy="1815" rx="12" ry="5" fill="#FFFFFF" transform="rotate(30 590 1815)"/>
   <!-- M3 -> B4, tapered: bulge then thin pinch -->
-  <path d="M880,1980 C860,2080 830,2160 800,2220" fill="none" stroke="url(#strandGrad)" stroke-width="28" stroke-linecap="round"/>
+  <path id="strand-8" class="strand-wiggle" d="M880,1980 C860,2080 830,2160 800,2220" fill="none" stroke="url(#strandGrad)" stroke-width="28" stroke-linecap="round"/>
   <ellipse cx="840" cy="2100" rx="15" ry="7" fill="#FFFFFF" transform="rotate(108 840 2100)"/>
-  <path d="M800,2220 C780,2260 765,2280 750,2300" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <path id="strand-9" class="strand-wiggle" d="M800,2220 C780,2260 765,2280 750,2300" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
   <ellipse cx="775" cy="2260" rx="9" ry="4" fill="#FFFFFF" transform="rotate(122 775 2260)"/>
 
   <!-- B4 -> M4 -->
-  <path d="M750,2300 C550,2450 250,2580 90,2680" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <path id="strand-10" class="strand-wiggle" d="M750,2300 C550,2450 250,2580 90,2680" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
   <ellipse cx="420" cy="2490" rx="11" ry="5" fill="#FFFFFF" transform="rotate(150 420 2490)"/>
   <!-- M4 -> B5 -->
-  <path d="M90,2680 C110,2850 150,2980 200,3100" fill="none" stroke="url(#strandGrad)" stroke-width="24" stroke-linecap="round"/>
+  <path id="strand-11" class="strand-wiggle" d="M90,2680 C110,2850 150,2980 200,3100" fill="none" stroke="url(#strandGrad)" stroke-width="24" stroke-linecap="round"/>
   <ellipse cx="145" cy="2890" rx="13" ry="6" fill="#FFFFFF" transform="rotate(75 145 2890)"/>
   <!-- B5 -> M5 -->
-  <path d="M200,3100 C350,3220 520,3320 650,3380" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
+  <path id="strand-12" class="strand-wiggle" d="M200,3100 C350,3220 520,3320 650,3380" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
   <ellipse cx="425" cy="3240" rx="10" ry="4" fill="#FFFFFF" transform="rotate(32 425 3240)"/>
 
   <!-- === strands that run off the edge of the page instead of connecting to a blob === -->
-  <path d="M150,300 C100,180 60,60 -60,-90" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <path id="strand-13" class="strand-wiggle" d="M150,300 C100,180 60,60 -60,-90" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
   <ellipse cx="45" cy="105" rx="9" ry="4" fill="#FFFFFF" transform="rotate(62 45 105)"/>
-  <path d="M830,900 C920,850 980,820 1080,760" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <path id="strand-14" class="strand-wiggle" d="M830,900 C920,850 980,820 1080,760" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
   <ellipse cx="955" cy="830" rx="11" ry="5" fill="#FFFFFF" transform="rotate(-29 955 830)"/>
-  <path d="M500,1180 C380,1220 250,1250 -70,1300" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <path id="strand-15" class="strand-wiggle" d="M500,1180 C380,1220 250,1250 -70,1300" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
   <ellipse cx="215" cy="1240" rx="8" ry="3" fill="#FFFFFF" transform="rotate(-12 215 1240)"/>
-  <path d="M750,2300 C880,2250 960,2220 1080,2160" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <path id="strand-16" class="strand-wiggle" d="M750,2300 C880,2250 960,2220 1080,2160" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
   <ellipse cx="915" cy="2230" rx="11" ry="5" fill="#FFFFFF" transform="rotate(-23 915 2230)"/>
-  <path d="M90,2680 C10,2820 -60,2950 -140,3120" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
+  <path id="strand-17" class="strand-wiggle" d="M90,2680 C10,2820 -60,2950 -140,3120" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
   <ellipse cx="-25" cy="2900" rx="14" ry="6" fill="#FFFFFF" transform="rotate(-62 -25 2900)"/>
-  <path d="M200,3100 C280,3270 380,3430 520,3660" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <path id="strand-18" class="strand-wiggle" d="M200,3100 C280,3270 380,3430 520,3660" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
   <ellipse cx="360" cy="3380" rx="9" ry="4" fill="#FFFFFF" transform="rotate(60 360 3380)"/>
 
   <!-- === small pustules scattered along the strands, including a few at the pinched necks === -->
-  <use href="#smallPustule" transform="translate(500,540)"/>
-  <use href="#smallPustule" transform="translate(810,760) scale(0.9)"/>
-  <use href="#smallPustule" transform="translate(370,1480) scale(0.8)"/>
-  <use href="#smallPustule" transform="translate(330,1520) scale(0.7)"/>
-  <use href="#smallPustule" transform="translate(560,1980) scale(0.8)"/>
-  <use href="#smallPustule" transform="translate(795,2240) scale(0.7)"/>
-  <use href="#smallPustule" transform="translate(430,2560) scale(1.2)"/>
-  <use href="#smallPustule" transform="translate(40,180) scale(0.9)"/>
-  <use href="#smallPustule" transform="translate(960,800) scale(1.1)"/>
-  <use href="#smallPustule" transform="translate(90,1740) scale(0.85)"/>
-  <use href="#smallPustule" transform="translate(310,3320) scale(1.15)"/>
+  <g transform="translate(500,540)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:1;animation-duration:2.90s;animation-delay:0.25s"/>
+  </g>
+  <g transform="translate(810,760)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.9;animation-duration:3.20s;animation-delay:0.50s"/>
+  </g>
+  <g transform="translate(370,1480)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.8;animation-duration:3.50s;animation-delay:0.75s"/>
+  </g>
+  <g transform="translate(330,1520)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.7;animation-duration:3.80s;animation-delay:1.00s"/>
+  </g>
+  <g transform="translate(560,1980)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.8;animation-duration:4.10s;animation-delay:0.00s"/>
+  </g>
+  <g transform="translate(795,2240)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.7;animation-duration:2.60s;animation-delay:0.25s"/>
+  </g>
+  <g transform="translate(430,2560)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:1.2;animation-duration:2.90s;animation-delay:0.50s"/>
+  </g>
+  <g transform="translate(40,180)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.9;animation-duration:3.20s;animation-delay:0.75s"/>
+  </g>
+  <g transform="translate(960,800)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:1.1;animation-duration:3.50s;animation-delay:1.00s"/>
+  </g>
+  <g transform="translate(90,1740)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:0.85;animation-duration:3.80s;animation-delay:0.00s"/>
+  </g>
+  <g transform="translate(310,3320)">
+    <use href="#smallPustule" class="pustule-pulse" style="--s:1.15;animation-duration:4.10s;animation-delay:0.25s"/>
+  </g>
 
   <!-- === the few big blob clusters === -->
-  <use href="#bigBlob" transform="translate(150,300) scale(1.35) rotate(-8)"/>
-  <use href="#bigBlob" transform="translate(830,900) scale(1.1) rotate(14)"/>
-  <use href="#bigBlob" transform="translate(300,1650) scale(1.5) rotate(-20)"/>
-  <use href="#bigBlob" transform="translate(750,2300) scale(1.0) rotate(9)"/>
-  <use href="#bigBlob" transform="translate(200,3100) scale(1.25) rotate(-12)"/>
+  <g transform="translate(150,300) rotate(-8)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:1.35;animation-duration:3.95s;animation-delay:0.40s"/>
+  </g>
+  <g transform="translate(830,900) rotate(14)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:1.1;animation-duration:4.30s;animation-delay:0.80s"/>
+  </g>
+  <g transform="translate(300,1650) rotate(-20)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:1.5;animation-duration:4.65s;animation-delay:1.20s"/>
+  </g>
+  <g transform="translate(750,2300) rotate(9)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:1.0;animation-duration:5.00s;animation-delay:0.00s"/>
+  </g>
+  <g transform="translate(200,3100) rotate(-12)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:1.25;animation-duration:3.60s;animation-delay:0.40s"/>
+  </g>
 
   <!-- === smaller blobs bridging the big ones === -->
-  <use href="#bigBlob" transform="translate(620,480) scale(0.6) rotate(20)"/>
-  <use href="#bigBlob" transform="translate(500,1180) scale(0.55) rotate(-15)"/>
-  <use href="#bigBlob" transform="translate(880,1980) scale(0.65) rotate(25)"/>
-  <use href="#bigBlob" transform="translate(90,2680) scale(0.5) rotate(-10)"/>
-  <use href="#bigBlob" transform="translate(650,3380) scale(0.6) rotate(15)"/>
+  <g transform="translate(620,480) rotate(20)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:0.6;animation-duration:3.95s;animation-delay:0.80s"/>
+  </g>
+  <g transform="translate(500,1180) rotate(-15)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:0.55;animation-duration:4.30s;animation-delay:1.20s"/>
+  </g>
+  <g transform="translate(880,1980) rotate(25)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:0.65;animation-duration:4.65s;animation-delay:0.00s"/>
+  </g>
+  <g transform="translate(90,2680) rotate(-10)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:0.5;animation-duration:5.00s;animation-delay:0.40s"/>
+  </g>
+  <g transform="translate(650,3380) rotate(15)">
+    <use href="#bigBlob" class="blob-pulse" style="--s:0.6;animation-duration:3.60s;animation-delay:0.80s"/>
+  </g>
 </svg>
