@@ -214,26 +214,35 @@ main.content::before {
   border-radius: 8px;
 }
 
-/* Heroes section: collage lineup, everyone standing on the same ground line */
+/* Heroes section: team-lineup collage, everyone standing on the same ground
+   line. Sizes are kept modest and the row carries horizontal padding so the
+   rotation/drop-shadow bleed on each figure has room to breathe before it
+   hits the row's overflow guard - that guard exists only to stop the page
+   itself from gaining a horizontal scrollbar, not to trim the art. */
 #heroes .post-content p:has(img) {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1.5em;
-  /* The overlapping negative margins between images can push the last image
-     on a wrapped line a few px past the row's own edge on narrow screens,
-     leaking onto the page background - clip that spillover here. */
+  /* Padding on every side, generous enough that the drop-shadow/rotation
+     bleed from the images below never actually reaches the box edge -
+     see the overflow comment below for why that matters. */
+  padding: 16px 28px 28px;
   max-width: 100%;
-  overflow-x: hidden;
+  /* Per the CSS overflow spec, pairing 'hidden' on one axis with
+     'visible' on the other computes the visible one as 'auto' too -
+     explicitly writing overflow-y: visible does NOT opt out of that,
+     so it still produced a scrollbar the instant the row's paint (the
+     drop-shadow bleeding past the flex-end baseline) overflowed the
+     box. Both axes need to be non-visible to avoid the coupling; the
+     padding above then keeps that clipping from ever being visible. */
+  overflow: hidden;
 }
 
 #heroes .post-content img {
-  height: 260px;
+  height: 200px;
   width: auto;
-  /* Relative to the .post container (which is only 80% viewport width, see
-     theme.scss), not the full viewport - 90vw was wider than the container
-     itself and made images spill past the section's edge on mobile. */
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
@@ -241,55 +250,53 @@ main.content::before {
 
 /* Spear fighter: lunges low and wide, so it reads smaller in the lineup */
 #heroes .post-content img:nth-child(1) {
-  height: 170px;
-  margin-right: -1.5em;
+  height: 130px;
+  margin-right: -16px;
   transform: rotate(-2deg);
   z-index: 1;
 }
 
-/* Pineapple brawler: the tallest - kept off the row's outer edge and
-   overlapped on both sides so it can't be clipped by the row's overflow
-   guard, unlike a lone full-width image sitting flush against the edge. */
+/* Pineapple brawler: the tallest, standing at the back of the group */
 #heroes .post-content img:nth-child(2) {
-  height: 360px;
-  margin-right: -1.5em;
+  height: 250px;
+  margin-right: -16px;
   z-index: 3;
 }
 
 /* Leafy pineapple: mid-height, standing just behind */
 #heroes .post-content img:nth-child(3) {
-  height: 320px;
-  margin-right: -2em;
+  height: 220px;
+  margin-right: -24px;
   z-index: 2;
   transform: rotate(1deg);
 }
 
-/* Berry: the small one, tucked in front - safe to leave at the row's edge */
+/* Berry: the small one, tucked in front */
 #heroes .post-content img:nth-child(4) {
-  height: 150px;
+  height: 115px;
   z-index: 4;
 }
 
-/* Enemies section: collage lineup, closing in on the same ground line */
+/* Enemies section: team-lineup collage, closing in on the same ground line.
+   Same rationale as the heroes row above - modest sizes plus row padding so
+   nothing gets trimmed by the overflow guard. */
 #enemies .post-content p:has(img) {
   display: flex;
   align-items: flex-end;
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1.5em;
-  /* The overlapping negative margins between images can push the last image
-     on a wrapped line a few px past the row's own edge on narrow screens,
-     leaking onto the page background - clip that spillover here. */
+  padding: 16px 28px 28px;
   max-width: 100%;
-  overflow-x: hidden;
+  /* See the matching comment in the heroes rule above for why both axes
+     need to be hidden (not just overflow-x), and why the padding above
+     is what actually keeps that from clipping anything visible. */
+  overflow: hidden;
 }
 
 #enemies .post-content img {
-  height: 260px;
+  height: 200px;
   width: auto;
-  /* Relative to the .post container (which is only 80% viewport width, see
-     theme.scss), not the full viewport - 90vw was wider than the container
-     itself and made images spill past the section's edge on mobile. */
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
@@ -297,47 +304,82 @@ main.content::before {
 
 /* Cherry twins: the small ones, tucked in front */
 #enemies .post-content img:nth-child(1) {
-  height: 160px;
-  margin-right: -1em;
+  height: 140px;
+  margin-right: -14px;
   transform: rotate(-2deg);
   z-index: 2;
 }
 
-/* Pumpkin tank: the tallest - kept off the row's outer edge and overlapped
-   on both sides so it can't be clipped by the row's overflow guard, unlike
-   a lone full-width image sitting flush against the edge. */
+/* Pumpkin tank: the tallest, standing at the back of the group */
 #enemies .post-content img:nth-child(2) {
-  height: 380px;
-  margin-right: -2em;
+  height: 260px;
+  margin-right: -20px;
   z-index: 6;
 }
 
 /* Pepper: stands tall near the front */
 #enemies .post-content img:nth-child(3) {
-  height: 300px;
-  margin-right: -1.5em;
+  height: 210px;
+  margin-right: -16px;
   z-index: 5;
 }
 
 /* Horned shell enemy: wide, hangs back a little */
 #enemies .post-content img:nth-child(4) {
-  height: 260px;
-  margin-right: -1.5em;
+  height: 190px;
+  margin-right: -16px;
   transform: rotate(-1deg);
   z-index: 3;
 }
 
 /* Leaping leaf enemy: mid-air and dynamic */
 #enemies .post-content img:nth-child(5) {
-  height: 340px;
-  margin-right: -2em;
+  height: 230px;
+  margin-right: -20px;
   transform: rotate(3deg);
   z-index: 4;
 }
 
-/* Crouching leaf enemy: low and wide - safe to leave at the row's edge */
+/* Crouching leaf enemy: low and wide */
 #enemies .post-content img:nth-child(6) {
-  height: 210px;
+  height: 150px;
   transform: rotate(2deg);
   z-index: 1;
+}
+
+/* Below this width the side-by-side lineup gets cramped, so both rows
+   switch to a vertical stack - a deck of overlapping portraits instead of
+   a shoulder-to-shoulder line. Rotation is dropped so the stack reads as
+   tidy rather than jumbled, and every image shares one fluid width so the
+   stack never needs a horizontal scrollbar to display fully. */
+@media only screen and (max-width: 700px) {
+  #heroes .post-content p:has(img),
+  #enemies .post-content p:has(img) {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px 28px;
+  }
+
+  #heroes .post-content img,
+  #heroes .post-content img:nth-child(1),
+  #heroes .post-content img:nth-child(2),
+  #heroes .post-content img:nth-child(3),
+  #heroes .post-content img:nth-child(4),
+  #enemies .post-content img,
+  #enemies .post-content img:nth-child(1),
+  #enemies .post-content img:nth-child(2),
+  #enemies .post-content img:nth-child(3),
+  #enemies .post-content img:nth-child(4),
+  #enemies .post-content img:nth-child(5),
+  #enemies .post-content img:nth-child(6) {
+    height: auto;
+    width: min(200px, 60vw);
+    margin: -26px 0 0;
+    transform: none;
+  }
+
+  #heroes .post-content img:first-child,
+  #enemies .post-content img:first-child {
+    margin-top: 0;
+  }
 }
