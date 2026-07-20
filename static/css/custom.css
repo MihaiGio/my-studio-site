@@ -247,11 +247,13 @@ main.content::before {
   z-index: 1;
 }
 
-/* Berry: the small one, tucked in front */
+/* Pineapple brawler: the tallest - kept off the row's outer edge and
+   overlapped on both sides so it can't be clipped by the row's overflow
+   guard, unlike a lone full-width image sitting flush against the edge. */
 #heroes .post-content img:nth-child(2) {
-  height: 150px;
-  margin-right: -1em;
-  z-index: 4;
+  height: 360px;
+  margin-right: -1.5em;
+  z-index: 3;
 }
 
 /* Leafy pineapple: mid-height, standing just behind */
@@ -262,10 +264,10 @@ main.content::before {
   transform: rotate(1deg);
 }
 
-/* Pineapple brawler: the tallest, anchors the group */
+/* Berry: the small one, tucked in front - safe to leave at the row's edge */
 #heroes .post-content img:nth-child(4) {
-  height: 360px;
-  z-index: 3;
+  height: 150px;
+  z-index: 4;
 }
 
 /* Enemies section: collage lineup, closing in on the same ground line */
@@ -301,12 +303,13 @@ main.content::before {
   z-index: 2;
 }
 
-/* Crouching leaf enemy: low and wide */
+/* Pumpkin tank: the tallest - kept off the row's outer edge and overlapped
+   on both sides so it can't be clipped by the row's overflow guard, unlike
+   a lone full-width image sitting flush against the edge. */
 #enemies .post-content img:nth-child(2) {
-  height: 210px;
+  height: 380px;
   margin-right: -2em;
-  transform: rotate(2deg);
-  z-index: 1;
+  z-index: 6;
 }
 
 /* Pepper: stands tall near the front */
@@ -332,8 +335,9 @@ main.content::before {
   z-index: 4;
 }
 
-/* Pumpkin tank: the tallest, anchors the group */
+/* Crouching leaf enemy: low and wide - safe to leave at the row's edge */
 #enemies .post-content img:nth-child(6) {
-  height: 380px;
-  z-index: 6;
+  height: 210px;
+  transform: rotate(2deg);
+  z-index: 1;
 }
