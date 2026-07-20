@@ -168,6 +168,14 @@ main.content::before {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: var(--highlight) rgba(0, 0, 0, 0.15);
+  cursor: grab;
+}
+
+/* Applied by custom.js while the mouse button is held, to drag-scroll the row */
+#cards .post-content p:has(img).dragging {
+  cursor: grabbing;
+  scroll-snap-type: none;
+  user-select: none;
 }
 
 #cards .post-content img {
