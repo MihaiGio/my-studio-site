@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 3600" width="1000" height="3600">
+  <defs>
+    <radialGradient id="blobMain" cx="38%" cy="30%" r="75%">
+      <stop offset="0%" stop-color="#FF8CEA"/>
+      <stop offset="45%" stop-color="#E600FF"/>
+      <stop offset="100%" stop-color="#5A00C4"/>
+    </radialGradient>
+    <radialGradient id="blobCore" cx="35%" cy="28%" r="80%">
+      <stop offset="0%" stop-color="#FFD0F7"/>
+      <stop offset="55%" stop-color="#FF1493"/>
+      <stop offset="100%" stop-color="#B4009A"/>
+    </radialGradient>
+    <radialGradient id="blobSmall" cx="35%" cy="30%" r="80%">
+      <stop offset="0%" stop-color="#FFB3F0"/>
+      <stop offset="50%" stop-color="#FF1493"/>
+      <stop offset="100%" stop-color="#7700FF"/>
+    </radialGradient>
+    <linearGradient id="strandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5A00C4"/>
+      <stop offset="50%" stop-color="#9A2FFF"/>
+      <stop offset="100%" stop-color="#5A00C4"/>
+    </linearGradient>
+
+    <!-- reusable big blob cluster: main body + glossy core + small side bud -->
+    <g id="bigBlob">
+      <path d="M5,-88 C55,-92 92,-48 88,4 C85,54 48,92 -4,88 C-52,85 -90,50 -86,-2 C-83,-50 -46,-90 5,-88 Z" fill="url(#blobMain)"/>
+      <path d="M70,-88 C88,-90 102,-76 100,-58 C98,-42 82,-30 64,-33 C50,-35 42,-50 46,-64 C49,-76 58,-86 70,-88 Z" fill="url(#blobSmall)"/>
+      <path d="M-15,-58 C15,-60 40,-35 38,-5 C37,22 12,45 -18,42 C-45,40 -60,15 -57,-12 C-55,-38 -32,-56 -15,-58 Z" fill="url(#blobCore)"/>
+    </g>
+
+    <!-- reusable small pustule for mid-strand accents -->
+    <g id="smallPustule">
+      <path d="M0,-22 C12,-23 22,-13 22,-1 C22,11 12,22 0,22 C-12,22 -22,11 -22,-1 C-22,-13 -12,-22 0,-22 Z" fill="url(#blobSmall)"/>
+    </g>
+  </defs>
+
+  <!-- === strands: wide connective-tissue bands (round caps, generous width) between
+       the blobs, each with a torn oval hole punched through the middle (pure white ->
+       vanishes under the multiply blend applied in CSS, so it reads as a real hole in
+       the stretched membrane, like the reference image) === -->
+
+  <!-- B1 -> M1 -->
+  <path d="M150,300 C350,320 480,420 620,480" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="385" cy="390" rx="11" ry="5" fill="#FFFFFF" transform="rotate(21 385 390)"/>
+  <!-- M1 -> B2, tapered: thick belly then a thin pinched neck -->
+  <path d="M620,480 C700,560 760,650 800,730" fill="none" stroke="url(#strandGrad)" stroke-width="30" stroke-linecap="round"/>
+  <ellipse cx="710" cy="605" rx="17" ry="7" fill="#FFFFFF" transform="rotate(54 710 605)"/>
+  <path d="M800,730 C815,780 822,840 830,900" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <ellipse cx="815" cy="815" rx="8" ry="3" fill="#FFFFFF" transform="rotate(80 815 815)"/>
+
+  <!-- B2 -> M2 -->
+  <path d="M830,900 C740,1000 600,1080 500,1180" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
+  <ellipse cx="665" cy="1040" rx="10" ry="4" fill="#FFFFFF" transform="rotate(140 665 1040)"/>
+  <!-- M2 -> B3, tapered: thin pinch then bulge -->
+  <path d="M500,1180 C450,1300 400,1400 360,1480" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <ellipse cx="430" cy="1330" rx="8" ry="3" fill="#FFFFFF" transform="rotate(115 430 1330)"/>
+  <path d="M360,1480 C340,1540 320,1590 300,1650" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
+  <ellipse cx="330" cy="1565" rx="14" ry="6" fill="#FFFFFF" transform="rotate(109 330 1565)"/>
+
+  <!-- B3 -> M3 -->
+  <path d="M300,1650 C480,1780 700,1880 880,1980" fill="none" stroke="url(#strandGrad)" stroke-width="22" stroke-linecap="round"/>
+  <ellipse cx="590" cy="1815" rx="12" ry="5" fill="#FFFFFF" transform="rotate(30 590 1815)"/>
+  <!-- M3 -> B4, tapered: bulge then thin pinch -->
+  <path d="M880,1980 C860,2080 830,2160 800,2220" fill="none" stroke="url(#strandGrad)" stroke-width="28" stroke-linecap="round"/>
+  <ellipse cx="840" cy="2100" rx="15" ry="7" fill="#FFFFFF" transform="rotate(108 840 2100)"/>
+  <path d="M800,2220 C780,2260 765,2280 750,2300" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <ellipse cx="775" cy="2260" rx="9" ry="4" fill="#FFFFFF" transform="rotate(122 775 2260)"/>
+
+  <!-- B4 -> M4 -->
+  <path d="M750,2300 C550,2450 250,2580 90,2680" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="420" cy="2490" rx="11" ry="5" fill="#FFFFFF" transform="rotate(150 420 2490)"/>
+  <!-- M4 -> B5 -->
+  <path d="M90,2680 C110,2850 150,2980 200,3100" fill="none" stroke="url(#strandGrad)" stroke-width="24" stroke-linecap="round"/>
+  <ellipse cx="145" cy="2890" rx="13" ry="6" fill="#FFFFFF" transform="rotate(75 145 2890)"/>
+  <!-- B5 -> M5 -->
+  <path d="M200,3100 C350,3220 520,3320 650,3380" fill="none" stroke="url(#strandGrad)" stroke-width="18" stroke-linecap="round"/>
+  <ellipse cx="425" cy="3240" rx="10" ry="4" fill="#FFFFFF" transform="rotate(32 425 3240)"/>
+
+  <!-- === strands that run off the edge of the page instead of connecting to a blob === -->
+  <path d="M150,300 C100,180 60,60 -60,-90" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <ellipse cx="45" cy="105" rx="9" ry="4" fill="#FFFFFF" transform="rotate(62 45 105)"/>
+  <path d="M830,900 C920,850 980,820 1080,760" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="955" cy="830" rx="11" ry="5" fill="#FFFFFF" transform="rotate(-29 955 830)"/>
+  <path d="M500,1180 C380,1220 250,1250 -70,1300" fill="none" stroke="url(#strandGrad)" stroke-width="14" stroke-linecap="round"/>
+  <ellipse cx="215" cy="1240" rx="8" ry="3" fill="#FFFFFF" transform="rotate(-12 215 1240)"/>
+  <path d="M750,2300 C880,2250 960,2220 1080,2160" fill="none" stroke="url(#strandGrad)" stroke-width="20" stroke-linecap="round"/>
+  <ellipse cx="915" cy="2230" rx="11" ry="5" fill="#FFFFFF" transform="rotate(-23 915 2230)"/>
+  <path d="M90,2680 C10,2820 -60,2950 -140,3120" fill="none" stroke="url(#strandGrad)" stroke-width="26" stroke-linecap="round"/>
+  <ellipse cx="-25" cy="2900" rx="14" ry="6" fill="#FFFFFF" transform="rotate(-62 -25 2900)"/>
+  <path d="M200,3100 C280,3270 380,3430 520,3660" fill="none" stroke="url(#strandGrad)" stroke-width="16" stroke-linecap="round"/>
+  <ellipse cx="360" cy="3380" rx="9" ry="4" fill="#FFFFFF" transform="rotate(60 360 3380)"/>
+
+  <!-- === small pustules scattered along the strands, including a few at the pinched necks === -->
+  <use href="#smallPustule" transform="translate(500,540)"/>
+  <use href="#smallPustule" transform="translate(810,760) scale(0.9)"/>
+  <use href="#smallPustule" transform="translate(370,1480) scale(0.8)"/>
+  <use href="#smallPustule" transform="translate(330,1520) scale(0.7)"/>
+  <use href="#smallPustule" transform="translate(560,1980) scale(0.8)"/>
+  <use href="#smallPustule" transform="translate(795,2240) scale(0.7)"/>
+  <use href="#smallPustule" transform="translate(430,2560) scale(1.2)"/>
+  <use href="#smallPustule" transform="translate(40,180) scale(0.9)"/>
+  <use href="#smallPustule" transform="translate(960,800) scale(1.1)"/>
+  <use href="#smallPustule" transform="translate(90,1740) scale(0.85)"/>
+  <use href="#smallPustule" transform="translate(310,3320) scale(1.15)"/>
+
+  <!-- === the few big blob clusters === -->
+  <use href="#bigBlob" transform="translate(150,300) scale(1.35) rotate(-8)"/>
+  <use href="#bigBlob" transform="translate(830,900) scale(1.1) rotate(14)"/>
+  <use href="#bigBlob" transform="translate(300,1650) scale(1.5) rotate(-20)"/>
+  <use href="#bigBlob" transform="translate(750,2300) scale(1.0) rotate(9)"/>
+  <use href="#bigBlob" transform="translate(200,3100) scale(1.25) rotate(-12)"/>
+
+  <!-- === smaller blobs bridging the big ones === -->
+  <use href="#bigBlob" transform="translate(620,480) scale(0.6) rotate(20)"/>
+  <use href="#bigBlob" transform="translate(500,1180) scale(0.55) rotate(-15)"/>
+  <use href="#bigBlob" transform="translate(880,1980) scale(0.65) rotate(25)"/>
+  <use href="#bigBlob" transform="translate(90,2680) scale(0.5) rotate(-10)"/>
+  <use href="#bigBlob" transform="translate(650,3380) scale(0.6) rotate(15)"/>
+</svg>

@@ -1,0 +1,50 @@
+baseURL = "https://MihaiGio.github.io/my-studio-site/"
+disableKinds = ["section", "taxonomy", "term", "RSS", "robotsTXT"]
+defaultContentLanguage = "en"
+theme = "hugo-scroll"
+title = "My New Hugo Project"
+enableEmoji = true
+
+[params]
+favicon = "images/favicon.png"
+images = ["images/cover-image.jpg"]
+title = "My New Hugo Project"
+description = "My professional portfolio"
+language_menu = true
+show_current_lang = true
+copyright = "© 2024 My Studio"
+hidedesignbyline = false
+invertSectionColors = false
+image_options = "webp q90 lanczos photo"
+combine_page_and_site_title = false
+
+[params.footer]
+showContactIcons = false
+showFooterLinks = false
+
+[params.meta]
+keywords = "portfolio, professional, studio"
+
+[[params.contacts]]
+label = "email"
+value = "contact@example.com"
+url = "mailto:contact@example.com"
+icon = "fa fa-envelope"
+
+[[params.contacts]]
+label = "phone"
+value = "+1 (555) 123-4567"
+url = "tel:+15551234567"
+icon = "fa fa-phone"
+
+[[params.contacts]]
+label = "GitHub"
+value = "github.com/yourname"
+url = "https://github.com/yourname"
+icon = "fa-brands fa-github"
+
+[languages]
+[languages.en]
+weight = 10
+languageName = "English"
+contentDir = "content/en"

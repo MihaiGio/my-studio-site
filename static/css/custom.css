@@ -1,0 +1,296 @@
+/* Custom Color Palette - overrides theme's own CSS variables */
+:root {
+  /* Cover / landing area */
+  --cover-text-color: #FFFFFF;
+  --highlight: #FF1493;
+  --highlight-contrast: #FFFFFF;
+  --highlight-inverse: #FFFF00;
+  --highlight-inverse-contrast: #7700FF;
+
+  --cover-title-and-description-guard-bg-color: rgba(119, 0, 255, 0.5);
+  --cover-title-text-shadow: #7700FF 0px 0px 7px;
+
+  /* Sticky nav menu */
+  --sticky-menu-text-color: #FF1493;
+
+  /* Alternating content sections */
+  --section-light-text-color: #2b0057;
+  --section-light-bg-color: #FFFF00;
+
+  --section-dark-text-color: #FFFFFF;
+  --section-dark-bg-color: #7700FF;
+
+  --section-uni-quote: #FF1493;
+  --section-uni-code-bg-color: #FF00FF;
+
+  /* Single pages (non-homepage) */
+  --single-page-text-color: var(--section-light-text-color);
+  --single-page-bg-color: var(--section-light-bg-color);
+
+  /* Footer */
+  --footer-color-background: #7700FF;
+  --footer-color: #FFFF00;
+}
+
+/* Use the theme's own "top sticky menu" layout (normally mobile-only, see
+   responsiveness.scss) at all screen sizes instead of the left sidebar layout. */
+.fixed-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  width: 100vw;
+  z-index: 99999;
+  border-radius: 0;
+  text-align: center;
+  padding: 4px;
+  transition: background-color 0.4s ease;
+}
+
+a.fn-item {
+  display: inline;
+  margin-left: 10px;
+}
+
+/* Keep anchor-jump targets from tucking under the fixed top bar */
+.post-holder .post {
+  scroll-margin-top: 48px;
+}
+
+.post-holder {
+  padding-top: 20px;
+}
+
+/* Welcome section: text column on the left, illustration column (1/3 width) on the right */
+#welcome .post-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  column-gap: 2em;
+  align-items: center;
+
+  /* Tune these to adjust spacing in the welcome text */
+  --welcome-line-height: 1.6;     /* space between wrapped lines within a paragraph */
+  --welcome-paragraph-gap: 1em;   /* space between the two paragraphs */
+}
+
+/* Image sits only in row 1 of column 2 - it must NOT span into row 2, or row 2
+   gets stretched to make room for it (that's what caused the earlier huge gap). */
+#welcome .post-content p:first-child {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Text paragraphs get their own row each, so they never overlap. */
+#welcome .post-content p:nth-child(2) {
+  grid-column: 1;
+  grid-row: 1;
+  line-height: var(--welcome-line-height);
+  margin-bottom: var(--welcome-paragraph-gap);
+}
+
+#welcome .post-content p:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+  line-height: var(--welcome-line-height);
+  margin-bottom: var(--welcome-paragraph-gap);
+}
+
+#welcome .post-content img {
+  max-width: 100%;
+  height: auto;
+  transform: scaleX(-1);
+}
+
+/* ===== Spider-web overlay =====
+   One continuous custom SVG (static/images/effects/spider-web.svg), inspired by the
+   purple/magenta pustule shapes in the original mold PNGs but redrawn as our own
+   vector motif and hand-scattered rather than tiled per section. Just a handful of
+   big blob clusters sit at irregular points down the whole page, joined by long
+   diagonal strands that cross section boundaries; every strand either connects two
+   blobs or runs off the edge of the page, and smaller pustules dot the strands
+   between them. It's one absolutely-positioned layer spanning the full page height
+   (z-index:1, below the text at z-index:2), so it visually runs underneath the
+   content the whole way down instead of resetting at every section. */
+main.content {
+  position: relative;
+}
+
+main.content::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("/images/effects/spider-web.svg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  mix-blend-mode: multiply;
+  opacity: 0.7;
+}
+
+/* Keep the actual text above the decorative overlay layer */
+.post {
+  z-index: 2;
+}
+
+/* Cards section: horizontally scrolling gallery */
+#cards .post-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5em;
+  margin-top: 1em;
+}
+
+/* Intro text stays full-width above the scrolling row of images */
+#cards .post-content p:has(img) {
+  flex: 1 1 100%;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 1.5em;
+  padding-bottom: 1em;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--highlight) rgba(0, 0, 0, 0.15);
+}
+
+#cards .post-content img {
+  flex: 0 0 auto;
+  width: 220px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease;
+  scroll-snap-align: start;
+}
+
+#cards .post-content img:hover {
+  transform: scale(1.05);
+}
+
+/* Thin, theme-colored scrollbar so the gallery reads as scrollable */
+#cards .post-content::-webkit-scrollbar {
+  height: 10px;
+}
+
+#cards .post-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+#cards .post-content::-webkit-scrollbar-thumb {
+  background: var(--highlight);
+  border-radius: 8px;
+}
+
+/* Heroes section: collage lineup, everyone standing on the same ground line */
+#heroes .post-content p:has(img) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5em;
+}
+
+#heroes .post-content img {
+  height: 260px;
+  width: auto;
+  max-width: 90vw;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+}
+
+/* Spear fighter: lunges low and wide, so it reads smaller in the lineup */
+#heroes .post-content img:nth-child(1) {
+  height: 170px;
+  margin-right: -1.5em;
+  transform: rotate(-2deg);
+  z-index: 1;
+}
+
+/* Berry: the small one, tucked in front */
+#heroes .post-content img:nth-child(2) {
+  height: 150px;
+  margin-right: -1em;
+  z-index: 4;
+}
+
+/* Leafy pineapple: mid-height, standing just behind */
+#heroes .post-content img:nth-child(3) {
+  height: 320px;
+  margin-right: -2em;
+  z-index: 2;
+  transform: rotate(1deg);
+}
+
+/* Pineapple brawler: the tallest, anchors the group */
+#heroes .post-content img:nth-child(4) {
+  height: 360px;
+  z-index: 3;
+}
+
+/* Enemies section: collage lineup, closing in on the same ground line */
+#enemies .post-content p:has(img) {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5em;
+}
+
+#enemies .post-content img {
+  height: 260px;
+  width: auto;
+  max-width: 90vw;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+}
+
+/* Cherry twins: the small ones, tucked in front */
+#enemies .post-content img:nth-child(1) {
+  height: 160px;
+  margin-right: -1em;
+  transform: rotate(-2deg);
+  z-index: 2;
+}
+
+/* Crouching leaf enemy: low and wide */
+#enemies .post-content img:nth-child(2) {
+  height: 210px;
+  margin-right: -2em;
+  transform: rotate(2deg);
+  z-index: 1;
+}
+
+/* Pepper: stands tall near the front */
+#enemies .post-content img:nth-child(3) {
+  height: 300px;
+  margin-right: -1.5em;
+  z-index: 5;
+}
+
+/* Horned shell enemy: wide, hangs back a little */
+#enemies .post-content img:nth-child(4) {
+  height: 260px;
+  margin-right: -1.5em;
+  transform: rotate(-1deg);
+  z-index: 3;
+}
+
+/* Leaping leaf enemy: mid-air and dynamic */
+#enemies .post-content img:nth-child(5) {
+  height: 340px;
+  margin-right: -2em;
+  transform: rotate(3deg);
+  z-index: 4;
+}
+
+/* Pumpkin tank: the tallest, anchors the group */
+#enemies .post-content img:nth-child(6) {
+  height: 380px;
+  z-index: 6;
+}
