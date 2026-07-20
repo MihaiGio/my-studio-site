@@ -226,7 +226,10 @@ main.content::before {
 #heroes .post-content img {
   height: 260px;
   width: auto;
-  max-width: 90vw;
+  /* Relative to the .post container (which is only 80% viewport width, see
+     theme.scss), not the full viewport - 90vw was wider than the container
+     itself and made images spill past the section's edge on mobile. */
+  max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
 }
@@ -272,7 +275,10 @@ main.content::before {
 #enemies .post-content img {
   height: 260px;
   width: auto;
-  max-width: 90vw;
+  /* Relative to the .post container (which is only 80% viewport width, see
+     theme.scss), not the full viewport - 90vw was wider than the container
+     itself and made images spill past the section's edge on mobile. */
+  max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
 }
