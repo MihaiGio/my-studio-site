@@ -130,6 +130,18 @@ main.content::before {
   opacity: 0.7;
 }
 
+/* On mobile, sections stack into a single narrow column, making the page much
+   taller relative to its width than the desktop layout the SVG's 1000x3600
+   viewBox was designed for. Stretching one copy to 100% 100% across that
+   extreme aspect ratio leaves it too sparse to read as covering the page, so
+   instead scale it to the viewport width and repeat it vertically. */
+@media only screen and (max-width: 768px) {
+  main.content::before {
+    background-repeat: repeat-y;
+    background-size: 100% auto;
+  }
+}
+
 /* Keep the actual text above the decorative overlay layer */
 .post {
   z-index: 2;
