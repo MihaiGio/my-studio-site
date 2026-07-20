@@ -38,10 +38,16 @@
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  /* Override the theme's own mobile media query, which still sets width: 100vw
+     (see responsiveness.scss) - 100vw overflows the true viewport width on
+     mobile by the scrollbar-gutter amount, showing as a white sliver on the
+     right edge when the page is pinched zoomed out. left/right: 0 with an
+     auto width always matches the real viewport exactly. */
+  width: auto;
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
-  width: 100vw;
   box-sizing: border-box;
   z-index: 99999;
   border-radius: 0;
