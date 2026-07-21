@@ -223,9 +223,9 @@
 
   // ===== Manual tuning knobs =====
   var BUBBLE_COUNT = 30; // how many images fall at once in the initial ambient population (fine-pointer/desktop devices)
-  var BUBBLE_COUNT_MOBILE = 30; // same, but for coarse-pointer (touch/mobile) devices - each bubble is 3 nested elements animating `transform` (fall/pulse/spin), so it's its own composited layer; low-end mobile GPUs feel the layer count much sooner than desktop does, so this is worth tuning down independently
+  var BUBBLE_COUNT_MOBILE = 10; // same, but for coarse-pointer (touch/mobile) devices - each bubble is 3 nested elements animating `transform` (fall/pulse/spin), so it's its own composited layer; low-end mobile GPUs feel the layer count much sooner than desktop does, so this is worth tuning down independently
   var MAX_TOTAL_BUBBLES = 60; // hard cap on ambient + left-click-spawned images combined (fine-pointer/desktop devices); the oldest is de-spawned to make room once this is reached
-  var MAX_TOTAL_BUBBLES_MOBILE = 60; // same cap, but for coarse-pointer (touch/mobile) devices
+  var MAX_TOTAL_BUBBLES_MOBILE = 20; // same cap, but for coarse-pointer (touch/mobile) devices
   var MIN_SIZE_PX = 40; // smallest an image can be rendered at
   var MAX_SIZE_PX = 160; // largest an image can be rendered at
   var OPACITY = 0.80; // 0 (invisible) - 1 (fully solid)
