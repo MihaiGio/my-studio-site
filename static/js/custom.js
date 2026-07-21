@@ -92,3 +92,138 @@
     );
   });
 })();
+
+// Falling color-shifting bubbles: a decorative overlay of small blobs that
+// drift from the top of the #welcome section (the first .post-holder) to
+// the bottom of the page on a loop, scrolling together with the content
+// (the layer lives inside main.content, see the CSS comment on
+// .bubble-field). Color isn't time-based - a rolling check compares each
+// bubble's current position against the .post-holder underneath it and
+// sets the bubble to whichever of yellow/purple contrasts with that
+// section's background, so it never blends into what it's crossing.
+(function () {
+  "use strict";
+
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  var lightColor = "#FFFF00";
+  var darkColor = "#7700FF";
+
+  var content = document.querySelector("main.content");
+  var holders = Array.prototype.slice.call(document.querySelectorAll(".post-holder"));
+  if (!content || !holders.length) return;
+
+  var BUBBLE_COUNT = 28;
+  var field = document.createElement("div");
+  field.className = "bubble-field";
+  field.setAttribute("aria-hidden", "true");
+  content.insertBefore(field, content.firstChild);
+
+  var bubbles = [];
+
+  // Shared by the ambient population above and the click-spawned bubbles
+  // below. `startTop` (px from the top of the field) defaults to 0 - the
+  // ambient bubbles fall the full field height; a click-spawned one starts
+  // wherever the cursor was instead, and `immediate` skips the randomized
+  // negative animation-delay so it visibly starts falling right away rather
+  // than appearing to already be mid-fall.
+  function createBubble(opts) {
+    opts = opts || {};
+    var bubble = document.createElement("span");
+    bubble.className = "bubble";
+
+    var dot = document.createElement("span");
+    dot.className = "bubble-dot";
+    bubble.appendChild(dot);
+    bubble.dotEl = dot;
+
+    var xPercent = opts.xPercent != null ? opts.xPercent : Math.random() * 100;
+    var startTop = opts.startTop || 0;
+
+    bubble.style.setProperty("--x", xPercent + "%");
+    bubble.style.setProperty("--size", (8 + Math.random() * 48) + "px");
+    bubble.style.setProperty("--drift", (Math.random() * 60 - 30) + "px");
+    bubble.style.top = startTop + "px";
+    bubble.startTop = startTop;
+
+    dot.style.setProperty("--pulse-duration", (1.6 + Math.random() * 2) + "s");
+    dot.style.setProperty("--pulse-delay", -(Math.random() * 4) + "s");
+    // px/second - kept on the element so retiming() can turn it back into a
+    // duration whenever the measured fall distance changes (e.g. on resize).
+    bubble.dataset.speed = 30 + Math.random() * 50;
+
+    if (opts.immediate) {
+      bubble.style.setProperty("--fall-delay", "0s");
+      bubble.dataset.delaySet = "1";
+    }
+
+    field.appendChild(bubble);
+    bubbles.push(bubble);
+    return bubble;
+  }
+
+  for (var i = 0; i < BUBBLE_COUNT; i++) {
+    createBubble();
+  }
+
+  // Re-measures the page height so the fall distance/duration stay correct
+  // after images or webfonts load and reflow the page, or the window resizes.
+  function retiming() {
+    var fieldHeight = field.offsetHeight;
+    bubbles.forEach(function (bubble) {
+      var travel = (fieldHeight - bubble.startTop) + 60;
+      var speed = parseFloat(bubble.dataset.speed);
+      var duration = travel / speed;
+      bubble.style.setProperty("--fall-distance", travel + "px");
+      bubble.style.setProperty("--fall-duration", duration + "s");
+      if (!bubble.dataset.delaySet) {
+        bubble.style.setProperty("--fall-delay", -(Math.random() * duration) + "s");
+        bubble.dataset.delaySet = "1";
+      }
+    });
+  }
+
+  retiming();
+  window.addEventListener("load", retiming);
+  window.addEventListener("resize", retiming);
+
+  // Left click anywhere on the page drops a new bubble at the cursor, with
+  // the same fall/pulse/color behavior as the ambient ones - it just starts
+  // at the click point instead of the top of #welcome.
+  document.addEventListener("click", function (e) {
+    if (e.button !== 0) return;
+
+    var fieldRect = field.getBoundingClientRect();
+    var y = e.clientY - fieldRect.top;
+    if (y < 0 || y > fieldRect.height || fieldRect.width === 0) return;
+
+    var xPercent = ((e.clientX - fieldRect.left) / fieldRect.width) * 100;
+    createBubble({ xPercent: xPercent, startTop: y, immediate: true });
+    retiming();
+    updateColors();
+  });
+
+  function updateColors() {
+    var holderRects = holders.map(function (holder) {
+      var r = holder.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, dark: holder.classList.contains("dark") };
+    });
+
+    bubbles.forEach(function (bubble) {
+      var r = bubble.getBoundingClientRect();
+      var centerY = r.top + r.height / 2;
+      for (var j = 0; j < holderRects.length; j++) {
+        var hr = holderRects[j];
+        if (centerY >= hr.top && centerY <= hr.bottom) {
+          bubble.dotEl.style.color = hr.dark ? lightColor : darkColor;
+          break;
+        }
+      }
+    });
+  }
+
+  updateColors();
+  setInterval(updateColors, 150);
+})();

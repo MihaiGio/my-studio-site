@@ -34,6 +34,20 @@
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.15));
 }
 
+/* ===== Custom pointer =====
+   Swaps the mouse cursor for a shrunk, tilted copy of one of the game's
+   creature drawings (static/images/drawings/12.png, originally 1647x823).
+   CSS `cursor: url()` has no width/height or transform controls - the image
+   is always shown at its own pixel size and orientation - so both "not too
+   big" and the diagonal tilt are baked into the pixels of the file itself
+   (rotated +25deg then downscaled) rather than done in CSS.
+   static/images/effects/cursor-12.png is that pre-rotated, pre-shrunk 48x38
+   copy. The hotspot (second/third numbers) sits near the creature's snout,
+   roughly where a normal arrow cursor's own tip would be. */
+body {
+  cursor: url("../images/effects/cursor-12.png") 8 6, auto;
+}
+
 /* Custom Color Palette - overrides theme's own CSS variables */
 :root {
   /* Cover / landing area */
@@ -388,6 +402,104 @@ main.content::after {
   height: 150px;
   transform: rotate(2deg);
   z-index: 1;
+}
+
+/* ===== Falling color-shifting bubbles =====
+   Decorative overlay: small blobs drift from the top of the #welcome section
+   to the bottom of the page on a continuous loop - soda bubbles, but going
+   down. The layer is absolutely positioned inside main.content (itself
+   position:relative, see the spider-web overlay rule above), which is the
+   containing block for #welcome - the first section in document order - so
+   inset:0 here lines its top edge up with the top of #welcome and scrolls
+   together with the rest of the page instead of staying pinned to the
+   viewport. custom.js measures main.content's height to size the fall
+   distance, and continuously checks each bubble's position against the
+   .post-holder underneath it (light vs dark background) to set the bubble's
+   color to whichever of yellow/purple contrasts with that section - not a
+   fixed time-based cycle, so a bubble is never the same color as the
+   section it's currently crossing.
+
+   Falling (translate) and pulsating (scale) both animate `transform`, and
+   two animations on the same element can't both drive the same property -
+   the second just overrides the first. So the outer .bubble only ever
+   translates (the fall), while the nested .bubble-dot (added by custom.js)
+   carries the visuals - color, glow, glossy highlight - and does its own
+   independent scale pulse. */
+.bubble-field {
+  position: absolute;
+  inset: 0;
+  z-index: 500;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bubble-field .bubble {
+  position: absolute;
+  top: 0;
+  left: var(--x, 50%);
+  width: var(--size, 16px);
+  height: var(--size, 16px);
+  animation: bubble-fall var(--fall-duration, 14s) linear infinite;
+  animation-delay: var(--fall-delay, 0s);
+}
+
+.bubble-field .bubble-dot {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 10px 2px currentColor, inset -2px -3px 4px rgba(0, 0, 0, 0.2);
+  color: #7700FF;
+  opacity: 0.55;
+  animation: bubble-pulse var(--pulse-duration, 2.4s) ease-in-out infinite;
+  animation-delay: var(--pulse-delay, 0s);
+  /* Smooth cross-fade as custom.js flips `color` between sections, instead
+     of snapping the instant the bubble's center crosses a boundary. */
+  transition: color 0.6s ease;
+}
+
+/* Glossy highlight so they read as bubbles rather than flat dots - fixed
+   relative to the dot, unaffected by the pulse/color animations. */
+.bubble-field .bubble-dot::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 22%;
+  width: 32%;
+  height: 32%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  filter: blur(1px);
+}
+
+/* Travels the full height of the page content (--fall-distance, set in JS
+   from main.content's measured height) rather than viewport-relative vh
+   units, since the layer now spans the document instead of the viewport. */
+@keyframes bubble-fall {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(var(--drift, 15px), calc(var(--fall-distance, 100%) / 2), 0);
+  }
+  100% {
+    transform: translate3d(0, var(--fall-distance, 100%), 0);
+  }
+}
+
+@keyframes bubble-pulse {
+  0%, 100% {
+    transform: scale(0.85);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble-field {
+    display: none;
+  }
 }
 
 /* Below this width the side-by-side lineup gets cramped, so both rows
