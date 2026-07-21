@@ -1,2 +1,3 @@
 <!-- Custom CSS for color palette -->
-<link rel="stylesheet" href="{{ "css/custom.css" | relURL }}">
+{{ $customCSS := resources.Get "css/custom.css" | resources.Fingerprint }}
+<link rel="stylesheet" href="{{ $customCSS.RelPermalink }}" integrity="{{ $customCSS.Data.Integrity }}">
