@@ -1,5 +1,4 @@
 ---
-header_image: "images/BGMenu.png"
 header_use_video: false
 header_logo: "images/logo color.svg"
 header_headline: "ARSVATRA"
