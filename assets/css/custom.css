@@ -99,6 +99,41 @@ body {
   --footer-color: #FFFF00;
 }
 
+/* Page scrollbar, recolored to match the site's palette instead of the
+   browser default gray. Firefox only gets a flat thumb/track pair (its
+   scrollbar-color property takes two colors, no gradients); WebKit browsers
+   get the full pink -> yellow -> purple gradient via ::-webkit-scrollbar-thumb. */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--highlight) var(--section-dark-bg-color);
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--section-dark-bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    var(--highlight),
+    var(--section-light-bg-color),
+    var(--section-dark-bg-color)
+  );
+  border-radius: 8px;
+  border: 2px solid var(--section-dark-bg-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    var(--highlight-inverse-contrast),
+    var(--highlight),
+    var(--section-light-bg-color)
+  );
+}
+
 /* Use the theme's own "top sticky menu" layout (normally mobile-only, see
    responsiveness.scss) at all screen sizes instead of the left sidebar layout. */
 .fixed-nav {

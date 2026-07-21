@@ -14,24 +14,46 @@
     return holder.classList.contains("dark") ? lightColor : darkColor;
   }
 
-  var observer = new IntersectionObserver(
-    function (entries) {
-      var best = null;
-      entries.forEach(function (entry) {
-        if (entry.isIntersecting && (!best || entry.intersectionRatio > best.intersectionRatio)) {
-          best = entry;
-        }
-      });
-      if (!best) return;
+  // Picks whichever section covers the most viewport pixels right now.
+  // IntersectionObserver's intersectionRatio is normalized to each target's
+  // own height, not the viewport - for a section much taller than the
+  // viewport (heroes/enemies/cards, full of images) the next section could
+  // already fill the screen well before the outgoing one's ratio dropped
+  // enough to hand off, leaving the nav showing the wrong (matching) color
+  // for a stretch of scrolling. Comparing raw visible pixel height instead
+  // ties the color to what's actually on screen, regardless of section height.
+  var ticking = false;
 
-      fixedNav.style.setProperty("background-color", contrastColorFor(best.target), "important");
-    },
-    { threshold: [0.25, 0.5, 0.75] }
-  );
+  function updateNavColor() {
+    ticking = false;
+    var viewportHeight = window.innerHeight;
+    var best = null;
+    var bestVisible = 0;
 
-  holders.forEach(function (holder) {
-    observer.observe(holder);
-  });
+    holders.forEach(function (holder) {
+      var rect = holder.getBoundingClientRect();
+      var visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+      if (visible > bestVisible) {
+        bestVisible = visible;
+        best = holder;
+      }
+    });
+
+    if (best) {
+      fixedNav.style.setProperty("background-color", contrastColorFor(best), "important");
+    }
+  }
+
+  function requestUpdate() {
+    if (!ticking) {
+      ticking = true;
+      window.requestAnimationFrame(updateNavColor);
+    }
+  }
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+  updateNavColor();
 })();
 
 // Cards gallery: let the mouse drag the horizontally scrolling row, since it
