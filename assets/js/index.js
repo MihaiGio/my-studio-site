@@ -105,5 +105,24 @@ var $sitehead = $("#site-head");
     }
     $("blockquote p").prepend('<span class="quo fa fa-quote-left"></span>');
     $("blockquote p").append('<span class="quo fa fa-quote-right"></span>');
+
+    // Liquid wave divider flow (see static/css/custom.css for why this is
+    // driven from rAF/wall-clock time instead of a CSS transform animation
+    // or SMIL <animateTransform>).
+    var waveTracks = document.querySelectorAll(".post-after-wave-track");
+    if (
+      waveTracks.length &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      var waveDurationMs = 18000; // matches the wave's former 18s CSS animation
+      var waveWidth = 1440; // one copy's width, matching the SVG viewBox
+      requestAnimationFrame(function tickWave(now) {
+        var offset = -((now % waveDurationMs) / waveDurationMs) * waveWidth;
+        for (var i = 0; i < waveTracks.length; i++) {
+          waveTracks[i].setAttribute("transform", "translate(" + offset + ",0)");
+        }
+        requestAnimationFrame(tickWave);
+      });
+    }
   });
 })(jQuery);

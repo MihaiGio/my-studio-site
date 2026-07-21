@@ -32,32 +32,24 @@
   height: 100%;
   overflow: hidden;
   fill: currentColor;
-  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.15));
 }
 
 /* Two copies of the drip path sit side by side (see the project-level
-   layouts/_default/index.html override) and this track slides left by
-   exactly one copy's width (1440 user units, matching the viewBox), so the
-   second copy lines up perfectly where the first started and the loop
-   point is invisible. */
-.post-after-wave-track {
-  animation: post-after-wave-flow 18s linear infinite;
-}
-
-@keyframes post-after-wave-flow {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-1440px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .post-after-wave-track {
-    animation: none;
-  }
-}
+   layouts/_default/index.html override) and get slid left by exactly one
+   copy's width (1440 user units, matching the viewBox) so the second copy
+   lines up perfectly where the first started and the loop point is
+   invisible. Driven from assets/js/index.js via requestAnimationFrame,
+   setting the <g>'s transform attribute directly, rather than a CSS
+   `transform` keyframe or SMIL <animateTransform>:
+   - A CSS transform animation forces the browser to composite the track
+     on the GPU as a cached raster layer, which came out visibly
+     stepped/pixelated on large/high-density screens.
+   - SMIL was tried as a fix (vector redraw every frame, no compositing),
+     but its animation clock doesn't reliably pause/resume across the
+     display:none toggling that the scroll handler's fadeOut/fadeIn does
+     on .post-after (see index.js) - it drifted instead of looping.
+   Recomputing the offset from elapsed wall-clock time every frame sidesteps
+   both: no compositing layer, and no pause/resume state to get out of sync. */
 
 /* ===== Custom pointer =====
    Swaps the mouse cursor for a shrunk, tilted copy of one of the game's
