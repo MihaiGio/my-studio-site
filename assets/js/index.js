@@ -18,6 +18,15 @@
  *   scroll events far more often than the screen repaints, so without this
  *   throttle the handler was doing many times more forced-layout work than
  *   it needed to - visible as stutter while scrolling on mobile.
+ * - Those same .offset()/.height() reads for #site-head and every .post are
+ *   now taken once (on load/resize) and cached, instead of being re-read on
+ *   every throttled scroll tick. They're document-relative measurements that
+ *   only change when the page's layout actually changes (resize, images/
+ *   fonts loading) - scrolling itself never moves them - so re-measuring on
+ *   every tick was forcing a synchronous layout for a value that hadn't
+ *   changed since the last one. The scroll handler itself now only reads
+ *   window.scrollTop/height and compares against the cache, with no layout
+ *   work of its own.
  */
 
 var $post = $(".post");
@@ -67,53 +76,75 @@ var $sitehead = $("#site-head");
 
     if ($sitehead.length) {
       var scrollTicking = false;
+      var scrollMetrics = null;
+
+      // Every value gathered here is document-relative (or a fixed DOM
+      // reference) and only changes when the page's own layout changes, not
+      // when the user scrolls - so it's measured once here (each read a
+      // forced synchronous layout) instead of on every scroll tick.
+      function measureScrollMetrics() {
+        var headTop = $sitehead.offset().top;
+        var lastItem = $(".fn-item[item_index='" + $postholder.length + "']");
+
+        var posts = $post.map(function () {
+          var $this = $(this);
+          var $holder = $this.parent(".post-holder");
+          var top = $this.offset().top;
+          return {
+            top: top,
+            bottom: top + $this.height(),
+            item: $(".fn-item[item_index='" + $holder.index() + "']"),
+            wave: $holder.prev(".post-holder").find(".post-after"),
+          };
+        }).get();
+
+        scrollMetrics = {
+          headTop: headTop,
+          headBottom: headTop + $sitehead.height() - 100,
+          footerHeight: $(".site-footer").height(),
+          lastItem: lastItem,
+          posts: posts,
+        };
+      }
 
       function handleScroll() {
         scrollTicking = false;
-        var w = $(window).scrollTop();
-        var g = $sitehead.offset().top;
-        var h = $sitehead.offset().top + $sitehead.height() - 100;
+        if (!scrollMetrics) return;
 
-        if (w >= Math.floor(g) && w <= Math.ceil(h)) {
+        var w = $(window).scrollTop();
+
+        if (w >= Math.floor(scrollMetrics.headTop) && w <= Math.ceil(scrollMetrics.headBottom)) {
           $(".fixed-nav").stop(true, true).fadeOut("fast");
         } else {
           $(".fixed-nav").stop(true, true).css("display", "flex").fadeIn("fast");
         }
 
-        $post.each(function () {
-          if (($(window).height() + w) > ($(document).height() - $(".site-footer").height())) {
-            var l = $postholder.length;
-            $(".fn-item").removeClass("active")
-            $(".fn-item[item_index='" + (l) + "']").addClass("active")
-          } else {
-            var f = $(this).offset().top;
-            var b = $(this).offset().top + $(this).height();
-            var t = $(this).parent(".post-holder").index();
-            var i = $(".fn-item[item_index='" + t + "']");
-            var a = $(this)
-              .parent(".post-holder")
-              .prev(".post-holder")
-              .find(".post-after");
-
-            $(this).attr("item_index", t);
-
-            if (w >= f && w <= b) {
-              i.addClass("active");
-              a.stop(true, true).fadeOut("slow");
+        if (($(window).height() + w) > ($(document).height() - scrollMetrics.footerHeight)) {
+          $(".fn-item").removeClass("active");
+          scrollMetrics.lastItem.addClass("active");
+        } else {
+          scrollMetrics.posts.forEach(function (p) {
+            if (w >= p.top && w <= p.bottom) {
+              p.item.addClass("active");
+              p.wave.stop(true, true).fadeOut("slow");
             } else {
-              i.removeClass("active");
-              a.stop(true, true).fadeIn("slow");
+              p.item.removeClass("active");
+              p.wave.stop(true, true).fadeIn("slow");
             }
+          });
         }
-        });
       }
 
+      measureScrollMetrics();
       $(window).on("scroll", function () {
         if (!scrollTicking) {
           scrollTicking = true;
           requestAnimationFrame(handleScroll);
         }
       });
+      // Web fonts/images loading late (or a resize) can change post heights
+      // and offsets enough to invalidate the cache above.
+      $(window).on("resize load", measureScrollMetrics);
     }
 
     var ulLiIcon = getComputedStyle(document.documentElement).getPropertyValue('--ul-li-icon');
@@ -134,13 +165,80 @@ var $sitehead = $("#site-head");
     ) {
       var waveDurationMs = 18000; // matches the wave's former 18s CSS animation
       var waveWidth = 1440; // one copy's width, matching the SVG viewBox
-      requestAnimationFrame(function tickWave(now) {
+
+      function tickWave(now) {
         var offset = -((now % waveDurationMs) / waveDurationMs) * waveWidth;
         for (var i = 0; i < waveTracks.length; i++) {
           waveTracks[i].setAttribute("transform", "translate(" + offset + ",0)");
         }
         requestAnimationFrame(tickWave);
+      }
+
+      // Every wave sits at the bottom of a .post-holder, so on a long page
+      // most of them are off-screen at any given scroll position - without
+      // this, the loop above still ran (and kept writing a transform to
+      // every track) even for the ones nowhere near the viewport. An
+      // IntersectionObserver lets the rAF loop stop entirely once none are
+      // visible, and restart the instant one scrolls back into (near) view,
+      // instead of ticking the whole page's worth of waves forever
+      // regardless of scroll position.
+      if (window.IntersectionObserver) {
+        var visibleWaveTracks = new Set();
+        var waveTicking = false;
+
+        function tickWaveWhileVisible(now) {
+          if (visibleWaveTracks.size === 0) {
+            waveTicking = false;
+            return;
+          }
+          var offset = -((now % waveDurationMs) / waveDurationMs) * waveWidth;
+          for (var i = 0; i < waveTracks.length; i++) {
+            waveTracks[i].setAttribute("transform", "translate(" + offset + ",0)");
+          }
+          requestAnimationFrame(tickWaveWhileVisible);
+        }
+
+        var waveObserver = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                visibleWaveTracks.add(entry.target);
+              } else {
+                visibleWaveTracks.delete(entry.target);
+              }
+            });
+            if (!waveTicking && visibleWaveTracks.size > 0) {
+              waveTicking = true;
+              requestAnimationFrame(tickWaveWhileVisible);
+            }
+          },
+          { rootMargin: "200px 0px" }
+        );
+
+        for (var wi = 0; wi < waveTracks.length; wi++) {
+          waveObserver.observe(waveTracks[wi]);
+        }
+      } else {
+        requestAnimationFrame(tickWave);
+      }
+    }
+
+    // Hero background drift (see #site-head.withCenteredImage in
+    // custom.css): unlike a `transform` animation, animating
+    // `background-position` isn't compositor-only - the browser has to
+    // repaint every frame it's running, even while the hero is scrolled
+    // fully out of view. Pausing it via IntersectionObserver when it's
+    // off-screen avoids paying that repaint cost for the rest of a long
+    // page's scrolling/lifetime.
+    var $heroBg = $("#site-head.withCenteredImage");
+    if ($heroBg.length && window.IntersectionObserver) {
+      var heroBgEl = $heroBg[0];
+      var heroBgObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          heroBgEl.classList.toggle("bg-drift-paused", !entry.isIntersecting);
+        });
       });
+      heroBgObserver.observe(heroBgEl);
     }
   });
 })(jQuery);

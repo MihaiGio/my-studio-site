@@ -313,6 +313,14 @@ a.fn-item {
   animation: hero-bg-drift 25s linear infinite;
 }
 
+/* Applied by index.js (via IntersectionObserver) while the hero is scrolled
+   out of view. background-position animations aren't compositor-only like a
+   transform - the browser repaints every frame they're running, even fully
+   off-screen - so this is worth pausing rather than just letting it tick. */
+#site-head.withCenteredImage.bg-drift-paused {
+  animation-play-state: paused;
+}
+
 /* Drifts exactly one tile's width/height (1023px) so the repeat wraps seamlessly */
 @keyframes hero-bg-drift {
   from {
@@ -506,6 +514,11 @@ main.content::after {
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+  /* drop-shadow is a blurred alpha-mask render, notably pricier than
+     box-shadow - promoting the image to its own compositing layer means
+     scrolling it just recomposites that cached layer instead of re-running
+     the blur on every frame it's on screen. */
+  will-change: filter;
 }
 
 /* Spear fighter: lunges low and wide, so it reads smaller in the lineup */
@@ -560,6 +573,8 @@ main.content::after {
   max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 10px rgba(0, 0, 0, 0.45));
+  /* See the matching comment on #heroes .post-content img above. */
+  will-change: filter;
 }
 
 /* Cherry twins: the small ones, tucked in front */
