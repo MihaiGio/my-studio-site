@@ -1,2 +1,25 @@
 <!-- Colors the sticky top bar with the previous section's color as the user scrolls -->
-<script src="{{ "js/custom.js" | relURL }}"></script>
+<!--
+  Falling-image sources for custom.js's decorative bubble-field. Listed once
+  here (Hugo Pipes needs the asset path to run .Resize) rather than also in
+  custom.js, so there's a single place to add/remove an image.
+
+  Each is resolved to two URLs: the original, and a downscaled copy for
+  touch/coarse-pointer devices (see custom.js) - full-size PNGs here run
+  1300px+ on a side but are only ever rendered at 40-160 CSS px, so mobile
+  pays full decode/network cost for resolution it never shows. 400px covers
+  that render size up to a ~2.5x device pixel ratio, so it still looks sharp
+  while cutting the bytes decoded per image substantially.
+-->
+{{ $names := slice "9.png" "11.png" "12.png" "13.png" "15.png" "berry3.png" "blueberry.png" }}
+{{ $fullURLs := slice }}
+{{ $mobileURLs := slice }}
+{{ range $names }}
+  {{ $res := resources.Get (printf "images/raininganimation/%s" .) }}
+  {{ if $res }}
+    {{ $fullURLs = $fullURLs | append $res.RelPermalink }}
+    {{ $mobile := $res.Resize "400x q75" }}
+    {{ $mobileURLs = $mobileURLs | append $mobile.RelPermalink }}
+  {{ end }}
+{{ end }}
+<script src="{{ "js/custom.js" | relURL }}" data-images="{{ jsonify $fullURLs }}" data-images-mobile="{{ jsonify $mobileURLs }}"></script>

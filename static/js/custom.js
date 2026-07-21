@@ -129,7 +129,8 @@
   }
 
   // ===== Manual tuning knobs =====
-  var BUBBLE_COUNT = 30; // how many images fall at once
+  var BUBBLE_COUNT = 30; // how many images fall at once in the initial ambient population
+  var MAX_TOTAL_BUBBLES = 60; // hard cap on ambient + left-click-spawned images combined; the oldest is de-spawned to make room once this is reached
   var MIN_SIZE_PX = 40; // smallest an image can be rendered at
   var MAX_SIZE_PX = 160; // largest an image can be rendered at
   var OPACITY = 0.80; // 0 (invisible) - 1 (fully solid)
@@ -138,20 +139,25 @@
   var COLLIDE_RADIUS = 70; // px of clearance an image tries to keep around the cursor
   var COLLIDE_PUSH = 2600; // how hard the cursor shoves an image away on contact
   var COLLIDE_SPRING = 0.006; // how strongly a pushed image springs back onto its falling path
-  var COLLIDE_DAMPING = 0.15; // velocity lost per frame (higher = settles faster, less bouncy)
+  var COLLIDE_DAMPING = 0.9; // velocity lost per frame (higher = settles faster, less bouncy)
+  var BUBBLE_RESTITUTION = 1; // bounciness of image-vs-image hits (1 = perfectly elastic, billiard-ball-like)
+  var BUBBLE_PUSH_STRENGTH = 1; // multiplier on how hard overlapping images shove apart (1 = exact depenetration, higher = more forceful)
   // ================================
 
-  var IMAGE_NAMES = ["9.png", "11.png", "12.png", "13.png", "15.png", "berry3.png", "blueberry.png"];
-
-  // custom.js is a plain static file (not run through Hugo's templating), so
-  // it can't resolve {{ "images/..." | relURL }} itself - instead it derives
-  // the site's base path from its own <script> src, which custom_body.html
-  // already builds correctly for the deployed subpath (see hugo.toml's
-  // baseURL).
   var scriptEl = document.currentScript;
-  var imageBase = scriptEl
-    ? scriptEl.src.replace(/js\/custom\.js(?:[?#].*)?$/, "images/raininganimation/")
-    : "images/raininganimation/";
+
+  // Coarse-pointer (touch/mobile) devices load downscaled copies of the
+  // falling images instead of the full-resolution ones - custom_body.html
+  // resizes them via Hugo's built-in image processing at build time and
+  // passes both sets of resolved URLs here as JSON, since this plain static
+  // file can't run Hugo's templating (or resizing) itself. Computed early
+  // so it's available for the image set choice below, and reused further
+  // down to gate the cursor-collision behavior too.
+  var hasPointerFine = !!(window.matchMedia && window.matchMedia("(pointer: fine)").matches);
+
+  var IMAGE_URLS = JSON.parse((scriptEl && scriptEl.dataset.images) || "[]");
+  var IMAGE_URLS_MOBILE = JSON.parse((scriptEl && scriptEl.dataset.imagesMobile) || "[]");
+  var ACTIVE_IMAGE_URLS = (!hasPointerFine && IMAGE_URLS_MOBILE.length) ? IMAGE_URLS_MOBILE : IMAGE_URLS;
 
   var content = document.querySelector("main.content");
   if (!content) return;
@@ -169,6 +175,15 @@
 
   var bubbles = [];
 
+  // Shared by the animationend cleanup (below) and the total-count cap in
+  // createBubble - removes a bubble from both the DOM and the `bubbles`
+  // array it's tracked in.
+  function removeBubble(bubble) {
+    bubble.remove();
+    var idx = bubbles.indexOf(bubble);
+    if (idx !== -1) bubbles.splice(idx, 1);
+  }
+
   // Shared by the ambient population above and the click-spawned bubbles
   // below. `startTop` (px from the top of the field) defaults to 0 - the
   // ambient bubbles fall the full field height; a click-spawned one starts
@@ -184,7 +199,7 @@
     dot.className = "bubble-dot";
     dot.style.opacity = OPACITY;
     var img = document.createElement("img");
-    img.src = imageBase + IMAGE_NAMES[Math.floor(Math.random() * IMAGE_NAMES.length)];
+    img.src = ACTIVE_IMAGE_URLS[Math.floor(Math.random() * ACTIVE_IMAGE_URLS.length)];
     img.alt = "";
     img.decoding = "async";
     img.style.setProperty("--spin-duration", (MIN_SPIN_SECONDS + Math.random() * (MAX_SPIN_SECONDS - MIN_SPIN_SECONDS)) + "s");
@@ -234,14 +249,20 @@
       bubble.addEventListener("animationend", function onFallEnd(e) {
         if (e.animationName !== "bubble-fall") return;
         bubble.removeEventListener("animationend", onFallEnd);
-        bubble.remove();
-        var idx = bubbles.indexOf(bubble);
-        if (idx !== -1) bubbles.splice(idx, 1);
+        removeBubble(bubble);
       });
     }
 
     (opts.parent || field).appendChild(bubble);
     bubbles.push(bubble);
+
+    // Ambient and click-spawned images share one total cap - once it's
+    // reached, the oldest surviving bubble (whichever end of that mix it
+    // came from) is de-spawned to make room for this new one.
+    while (bubbles.length > MAX_TOTAL_BUBBLES) {
+      removeBubble(bubbles[0]);
+    }
+
     return bubble;
   }
 
@@ -295,30 +316,28 @@
   // once it moves away. Kept off-screen until the first real mousemove so
   // nothing gets nudged before the pointer is known to be over the page.
   //
-  // Skipped entirely on touch devices: there's no mouse to collide with,
-  // so stepCollisions would just spend a getBoundingClientRect() layout
-  // read on every one of the 30 bubbles, every frame, forever, for zero
-  // visible effect - a steady drain that was showing up as stutter on
-  // mobile.
-  if (!window.matchMedia || !window.matchMedia("(pointer: fine)").matches) {
-    return;
-  }
+  // Skipped on touch devices (there's no mouse to collide with), but the
+  // bubble-vs-bubble collision below still runs everywhere - it's what keeps
+  // ambient and click-spawned images from overlapping regardless of device.
+  // (hasPointerFine itself is computed above, alongside the image-set choice.)
 
   var mouseX = -9999;
   var mouseY = -9999;
 
-  window.addEventListener("mousemove", function (e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  }, { passive: true });
+  if (hasPointerFine) {
+    window.addEventListener("mousemove", function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    }, { passive: true });
 
-  window.addEventListener("mouseleave", function () {
-    mouseX = -9999;
-    mouseY = -9999;
-  });
+    window.addEventListener("mouseleave", function () {
+      mouseX = -9999;
+      mouseY = -9999;
+    });
+  }
 
   function stepCollisions() {
-    // Reads and writes are done in two separate passes over `bubbles` -
+    // Reads and writes are done in separate passes over `bubbles` -
     // interleaving getBoundingClientRect() (forces layout) with a
     // style.transform write (invalidates layout) on each element in turn
     // would force the browser to redo layout up to 30 times a frame instead
@@ -332,20 +351,82 @@
       bubble._cx = rect.left + rect.width / 2;
       bubble._cy = rect.top + rect.height / 2;
       bubble._halfWidth = rect.width / 2;
+
+      // Real on-screen velocity, inferred from the position change since
+      // last frame - this already bakes in the fall speed, the horizontal
+      // drift, AND any push offset already applied (since all of those move
+      // _cx/_cy), so it's the true closing speed two images hit each other
+      // with, not just the JS-driven push velocity below.
+      bubble._realVelX = bubble._prevCx == null ? 0 : bubble._cx - bubble._prevCx;
+      bubble._realVelY = bubble._prevCy == null ? 0 : bubble._cy - bubble._prevCy;
+      bubble._prevCx = bubble._cx;
+      bubble._prevCy = bubble._cy;
     });
 
-    bubbles.forEach(function (bubble) {
-      var dx = bubble._cx - mouseX;
-      var dy = bubble._cy - mouseY;
-      var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-      var reach = COLLIDE_RADIUS + bubble._halfWidth;
+    if (hasPointerFine) {
+      bubbles.forEach(function (bubble) {
+        var dx = bubble._cx - mouseX;
+        var dy = bubble._cy - mouseY;
+        var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        var reach = COLLIDE_RADIUS + bubble._halfWidth;
 
-      if (dist < reach) {
-        var force = (1 - dist / reach) * COLLIDE_PUSH * (1 / 60);
-        bubble.velX += (dx / dist) * force;
-        bubble.velY += (dy / dist) * force;
+        if (dist < reach) {
+          var force = (1 - dist / reach) * COLLIDE_PUSH * (1 / 60);
+          bubble.velX += (dx / dist) * force;
+          bubble.velY += (dy / dist) * force;
+        }
+      });
+    }
+
+    // Bubble-vs-bubble collision: treated as solid circles that never
+    // overlap, resolved like a billiard-ball hit rather than a soft push -
+    // overlap is corrected instantly (no gradual oozing apart) and an
+    // elastic impulse exchanges momentum along the contact normal, sized by
+    // each image's real closing speed (see _realVelX/_realVelY above) and
+    // mass (bigger images are heavier, so a small one bounces off harder).
+    for (var i = 0; i < bubbles.length; i++) {
+      var a = bubbles[i];
+      for (var j = i + 1; j < bubbles.length; j++) {
+        var b = bubbles[j];
+        var dx = a._cx - b._cx;
+        var dy = a._cy - b._cy;
+        var minDist = a._halfWidth + b._halfWidth;
+        if (Math.abs(dx) >= minDist || Math.abs(dy) >= minDist) continue; // cheap reject before sqrt
+        var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+        if (dist >= minDist) continue;
+
+        var nx = dx / dist;
+        var ny = dy / dist;
+        var massA = a._halfWidth * a._halfWidth;
+        var massB = b._halfWidth * b._halfWidth;
+        var totalMass = massA + massB;
+
+        // Depenetrate fully in one step, weighted by mass, so the images
+        // never visibly sink into each other even for a single frame.
+        var overlap = (minDist - dist) * BUBBLE_PUSH_STRENGTH;
+        var correctionA = overlap * (massB / totalMass);
+        var correctionB = overlap * (massA / totalMass);
+        a.pushX += nx * correctionA;
+        a.pushY += ny * correctionA;
+        b.pushX -= nx * correctionB;
+        b.pushY -= ny * correctionB;
+
+        // Elastic impulse - only when actually closing (approach < 0), so
+        // two images already separating don't get an extra kick apart.
+        var relVelX = a._realVelX - b._realVelX;
+        var relVelY = a._realVelY - b._realVelY;
+        var approach = relVelX * nx + relVelY * ny;
+        if (approach < 0) {
+          var impulse = ((-(1 + BUBBLE_RESTITUTION) * approach) / (1 / massA + 1 / massB)) * BUBBLE_PUSH_STRENGTH;
+          a.velX += (impulse / massA) * nx;
+          a.velY += (impulse / massA) * ny;
+          b.velX -= (impulse / massB) * nx;
+          b.velY -= (impulse / massB) * ny;
+        }
       }
+    }
 
+    bubbles.forEach(function (bubble) {
       // Spring-and-damp back toward the unperturbed fall path so a shove
       // settles instead of drifting off or oscillating forever.
       bubble.velX += -bubble.pushX * COLLIDE_SPRING;
