@@ -239,14 +239,19 @@
       });
     }
 
-    field.appendChild(bubble);
+    (opts.parent || field).appendChild(bubble);
     bubbles.push(bubble);
     return bubble;
   }
 
+  // Built into a fragment and appended once, rather than 30 separate
+  // appendChild calls straight into the live .bubble-field, so the browser
+  // only has to do one insertion/reflow for the whole initial population.
+  var initialFragment = document.createDocumentFragment();
   for (var i = 0; i < BUBBLE_COUNT; i++) {
-    createBubble();
+    createBubble({ parent: initialFragment });
   }
+  field.appendChild(initialFragment);
 
   // Re-measures the page height so the fall distance/duration stay correct
   // after images or webfonts load and reflow the page, or the window resizes.
@@ -302,18 +307,27 @@
   });
 
   function stepCollisions() {
+    // Reads and writes are done in two separate passes over `bubbles` -
+    // interleaving getBoundingClientRect() (forces layout) with a
+    // style.transform write (invalidates layout) on each element in turn
+    // would force the browser to redo layout up to 30 times a frame instead
+    // of once.
     bubbles.forEach(function (bubble) {
       // Measured on .bubble-collide (not .bubble) so the push reacts to
       // where the image is actually rendered on screen right now - the
       // fall animation's translate3d plus any push already applied -
       // rather than its unperturbed position on the fall path.
       var rect = bubble.collideEl.getBoundingClientRect();
-      var cx = rect.left + rect.width / 2;
-      var cy = rect.top + rect.height / 2;
-      var dx = cx - mouseX;
-      var dy = cy - mouseY;
+      bubble._cx = rect.left + rect.width / 2;
+      bubble._cy = rect.top + rect.height / 2;
+      bubble._halfWidth = rect.width / 2;
+    });
+
+    bubbles.forEach(function (bubble) {
+      var dx = bubble._cx - mouseX;
+      var dy = bubble._cy - mouseY;
       var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-      var reach = COLLIDE_RADIUS + rect.width / 2;
+      var reach = COLLIDE_RADIUS + bubble._halfWidth;
 
       if (dist < reach) {
         var force = (1 - dist / reach) * COLLIDE_PUSH * (1 / 60);
