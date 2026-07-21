@@ -135,8 +135,12 @@ html {
 }
 
 /* Use the theme's own "top sticky menu" layout (normally mobile-only, see
-   responsiveness.scss) at all screen sizes instead of the left sidebar layout. */
-.fixed-nav {
+   responsiveness.scss) at all screen sizes instead of the left sidebar layout.
+   Fixed-positions once here, at the wrapper level, so the primary and
+   secondary bars (see .fixed-nav-secondary) just stack under it as normal
+   flex children instead of each having to independently reason about the
+   viewport. */
+.fixed-nav-wrapper {
   position: fixed;
   top: 0;
   left: 0;
@@ -147,20 +151,124 @@ html {
      right edge when the page is pinched zoomed out. left/right: 0 with an
      auto width always matches the real viewport exactly. */
   width: auto;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: center;
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   z-index: 99999;
+}
+
+.fixed-nav {
+  /* Overrides the theme's own .fixed-nav rule (theme.scss), which sets
+     position: fixed; top: 40px - its original left-sidebar design. Left
+     unoverridden, each bar would fix itself independently to that same
+     spot instead of stacking under .fixed-nav-wrapper as a normal flex
+     item, landing 40px down (not flush with the top) and, once the
+     secondary bar has content too, sitting directly on top of the primary
+     bar instead of below it. */
+  position: static;
+  flex-direction: row;
+  box-sizing: border-box;
   border-radius: 0;
   text-align: center;
-  padding: 4px;
+  padding: 4px 0;
   transition: background-color 0.4s ease;
+  /* The track underneath is twice as wide as the bar and scrolls past -
+     this clips it to exactly the bar's own width. */
+  overflow: hidden;
+}
+
+/* The overflow bar: holds whatever items don't fit on the primary bar
+   without truncating (see the nav-split IIFE in custom.js), and loops
+   toward the right - opposite of the primary bar - so the two are visually
+   distinct rather than reading as one bar repeated twice. Hidden outright
+   (not just empty) when nothing overflows, via the !important below, since
+   the scroll-triggered fadeOut/fadeIn in index.js sets its own inline
+   display/opacity on every ".fixed-nav" element (this one included) and
+   would otherwise fight with a plain display rule here. */
+.fixed-nav.fn-empty {
+  display: none !important;
+}
+
+/* Holds two back-to-back copies of the item list (see .fn-group and the
+   template comment in layouts/_default/index.html), each pinned to exactly
+   one viewport width via .fn-group's `width: 100vw` below - NOT sized as a
+   percentage of this element, which is what used to make the loop drift out
+   of sync with the actual bar width (a visible gap on wide screens, since
+   each copy shrank to its natural text width instead of filling the bar;
+   overlapping text on narrow screens, since flex items don't shrink below
+   their intrinsic content width by default - see min-width: 0 on a.fn-item
+   below). Animated exactly one copy's width (-100vw) so the moment it loops
+   back to 0 the screen shows the identical layout - the loop point is
+   invisible, like a news ticker. */
+.fn-track {
+  display: flex;
+  width: max-content;
+  animation: fn-marquee 24s linear infinite;
+}
+
+.fixed-nav:hover .fn-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fn-track {
+    animation: none;
+  }
+}
+
+@keyframes fn-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100vw);
+  }
+}
+
+/* Same loop as .fn-track, just run backwards, so the secondary bar's
+   content travels right instead of left. */
+.fn-track.fn-track-reverse {
+  animation-name: fn-marquee-reverse;
+}
+
+@keyframes fn-marquee-reverse {
+  from {
+    transform: translateX(-100vw);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* One full copy of the item list, pinned to exactly one viewport width so
+   the loop lines up at any screen size (see the .fn-track comment above). */
+.fn-group {
+  display: flex;
+  flex: 0 0 auto;
+  width: 100vw;
 }
 
 a.fn-item {
-  display: inline;
-  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Equal-width "buttons" that together fill the bar edge-to-edge, instead
+     of being sized to their text and clumped in the middle. min-width: 0
+     overrides flex's default (auto, i.e. "never shrink below the text's own
+     width") so items actually compress instead of overlapping the next
+     group when the bar is too narrow to fit every label at full size.
+     box-sizing: border-box keeps the 1em/side padding INSIDE that shrunk
+     width - without it (content-box, the default) the padding is added on
+     top of whatever width flex-shrink computes, so on a narrow screen the
+     padding alone can exceed an item's allotted share and push its content
+     out past its own box, visibly overlapping the next group over. */
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  margin-left: 0;
+  padding: 0 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /* Keep anchor-jump targets from tucking under the fixed top bar */

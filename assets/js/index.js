@@ -4,13 +4,14 @@
  * Project-level override of themes/hugo-scroll/assets/js/index.js (Hugo's
  * asset mounts resolve resources.Get "js/index.js" here first). Changes vs.
  * the theme original:
- * - The post-after wave divider's fadeOut/fadeIn calls now stop() any
- *   in-flight/queued animation first. Without it, the continuous scroll
- *   handler queues a fadeOut/fadeIn on every scroll tick; jQuery plays
+ * - The post-after wave divider's and fixed-nav's fadeOut/fadeIn calls now
+ *   stop() any in-flight/queued animation first. Without it, the continuous
+ *   scroll handler queues a fadeOut/fadeIn on every scroll tick; jQuery plays
  *   queued animations one at a time, so a fast scroll down piles up dozens
  *   of queued fadeOut calls, and reversing direction (scrolling up) queues
- *   its fadeIn behind all of them - the divider stays hidden for seconds
- *   because it's waiting for a backlog that's already visually done.
+ *   its fadeIn behind all of them - the element stays hidden for seconds,
+ *   then snaps back all at once, because it's working through a backlog
+ *   that's already visually done.
  * - The scroll handler's body (several jQuery .offset()/.height() calls,
  *   each a forced synchronous layout) now runs at most once per animation
  *   frame instead of once per native "scroll" event. Touch scrolling fires
@@ -74,9 +75,9 @@ var $sitehead = $("#site-head");
         var h = $sitehead.offset().top + $sitehead.height() - 100;
 
         if (w >= Math.floor(g) && w <= Math.ceil(h)) {
-          $(".fixed-nav").fadeOut("fast");
+          $(".fixed-nav").stop(true, true).fadeOut("fast");
         } else {
-          $(".fixed-nav").css("display", "flex").fadeIn("fast");
+          $(".fixed-nav").stop(true, true).css("display", "flex").fadeIn("fast");
         }
 
         $post.each(function () {

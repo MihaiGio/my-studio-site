@@ -5,9 +5,13 @@
   var lightColor = "#FFFF00";
   var darkColor = "#7700FF";
 
-  var fixedNav = document.querySelector(".fixed-nav");
+  // Both the primary and secondary nav bars (see the fn-empty/split split in
+  // this file's other IIFE) carry the .fixed-nav class, so both need the
+  // contrast color kept in sync - not just whichever one querySelector would
+  // have picked.
+  var fixedNavs = Array.prototype.slice.call(document.querySelectorAll(".fixed-nav"));
   var holders = Array.prototype.slice.call(document.querySelectorAll(".post-holder"));
-  if (!fixedNav || !holders.length) return;
+  if (!fixedNavs.length || !holders.length) return;
 
   // Always the opposite of the section currently underneath, so the bar can never match it.
   function contrastColorFor(holder) {
@@ -40,7 +44,10 @@
     });
 
     if (best) {
-      fixedNav.style.setProperty("background-color", contrastColorFor(best), "important");
+      var color = contrastColorFor(best);
+      fixedNavs.forEach(function (nav) {
+        nav.style.setProperty("background-color", color, "important");
+      });
     }
   }
 
@@ -54,6 +61,157 @@
   window.addEventListener("scroll", requestUpdate, { passive: true });
   window.addEventListener("resize", requestUpdate);
   updateNavColor();
+})();
+
+// Nav split: the primary nav bar's buttons stretch to fill it edge-to-edge
+// (see a.fn-item in custom.css), which means more items on the page means
+// less room per button - past a point the labels would have to truncate to
+// keep fitting. Rather than truncate, once a button's natural (unstretched)
+// width no longer fits its equal share of the bar, this moves it and
+// everything after it onto the secondary bar instead (which loops the
+// opposite direction, so the two read as distinct rows rather than one bar
+// repeated). The primary bar is server-rendered with the full list as a
+// working fallback (see layouts/_default/index.html) and the secondary bar
+// starts empty/hidden; this progressively enhances both from the canonical
+// item list in the inert <template>, rebuilding each bar's content
+// (including the duplicate copy each needs for its own seamless loop - see
+// the .fn-track comment in custom.css) only once it's actually measured a
+// need to split.
+(function () {
+  "use strict";
+
+  var wrapper = document.querySelector(".fixed-nav-wrapper");
+  var primary = document.querySelector(".fixed-nav:not(.fixed-nav-secondary)");
+  var secondary = document.querySelector(".fixed-nav-secondary");
+  var itemsTemplate = document.getElementById("fn-items-template");
+  if (!wrapper || !primary || !secondary || !itemsTemplate) return;
+
+  var primaryTrack = primary.querySelector(".fn-track");
+  var secondaryTrack = secondary.querySelector(".fn-track");
+
+  var sourceItems = Array.prototype.slice.call(itemsTemplate.content.querySelectorAll("a.fn-item"));
+  if (!sourceItems.length) return;
+
+  // Renders one throwaway copy of each item with no flex-stretch/shrink
+  // applied, so getBoundingClientRect reports its intrinsic text+padding
+  // width - i.e. the least width it needs to avoid truncating - rather than
+  // whatever width the previous layout pass squeezed it into.
+  function measureNaturalWidths() {
+    var probe = document.createElement("div");
+    probe.style.cssText = "position:absolute; visibility:hidden; top:0; left:-9999px; display:flex;";
+    probe.className = primary.className.replace("fn-empty", "") + " fn-measure-probe";
+    document.body.appendChild(probe);
+
+    var group = document.createElement("div");
+    group.className = "fn-group";
+    group.style.width = "auto";
+    probe.appendChild(group);
+
+    try {
+      return sourceItems.map(function (item) {
+        var clone = item.cloneNode(true);
+        clone.style.flex = "0 0 auto";
+        group.appendChild(clone);
+        return clone.getBoundingClientRect().width;
+      });
+    } finally {
+      document.body.removeChild(probe);
+    }
+  }
+
+  // Builds a track's two back-to-back copies in a detached fragment rather
+  // than writing straight into the live track - layout() only swaps the
+  // fragment in once BOTH the primary and secondary content are fully
+  // built, so a mid-way error can't leave a track cleared with nothing to
+  // replace it (which would show as an empty/missing bar).
+  function buildTrackFragment(items) {
+    if (!items.length) return null;
+
+    var groupA = document.createElement("div");
+    groupA.className = "fn-group";
+    var groupB = document.createElement("div");
+    groupB.className = "fn-group";
+    groupB.setAttribute("aria-hidden", "true");
+
+    items.forEach(function (item) {
+      groupA.appendChild(item.cloneNode(true));
+      groupB.appendChild(item.cloneNode(true));
+    });
+
+    var frag = document.createDocumentFragment();
+    frag.appendChild(groupA);
+    frag.appendChild(groupB);
+    return frag;
+  }
+
+  function layout() {
+    try {
+      // Measured from the wrapper, not the primary bar itself - the primary
+      // bar gets display:none'd by index.js's scroll handler while the hero
+      // section is on screen (including on first load, before any
+      // scrolling), which would otherwise read as 0 width and skip
+      // populating either bar until the next resize/load event fires. The
+      // wrapper is never hidden.
+      var availableWidth = wrapper.clientWidth;
+      if (!availableWidth) return;
+
+      var widths = measureNaturalWidths();
+      var total = sourceItems.length;
+
+      var widestOverall = 0;
+      for (var i = 0; i < total; i++) {
+        if (widths[i] > widestOverall) widestOverall = widths[i];
+      }
+
+      var primaryCount;
+      if (widestOverall * total <= availableWidth) {
+        // Everything fits its equal share on one bar untruncated - no split
+        // needed at all.
+        primaryCount = total;
+      } else {
+        // Split evenly between the two bars rather than packing the primary
+        // bar down to the bare minimum that fits - the primary/top bar gets
+        // the extra item when the count is odd, so it's always the larger
+        // (or equal) of the two.
+        primaryCount = Math.ceil(total / 2);
+        // Never leave a single straggler alone on the secondary bar.
+        if (total - primaryCount === 1 && primaryCount > 1) primaryCount--;
+      }
+
+      var primaryFrag = buildTrackFragment(sourceItems.slice(0, primaryCount));
+      var secondaryFrag = buildTrackFragment(sourceItems.slice(primaryCount));
+
+      if (primaryFrag) {
+        primaryTrack.textContent = "";
+        primaryTrack.appendChild(primaryFrag);
+      }
+      secondaryTrack.textContent = "";
+      if (secondaryFrag) secondaryTrack.appendChild(secondaryFrag);
+
+      secondary.classList.toggle("fn-empty", primaryCount >= total);
+    } catch (e) {
+      // Fail safe: leave whatever's already rendered (the server-rendered
+      // full list, or the last successful split) rather than risk a blank
+      // or half-updated bar.
+      if (window.console && console.error) console.error("nav-split layout failed", e);
+    }
+  }
+
+  var resizeTicking = false;
+  function requestLayout() {
+    if (resizeTicking) return;
+    resizeTicking = true;
+    window.requestAnimationFrame(function () {
+      resizeTicking = false;
+      layout();
+    });
+  }
+
+  layout();
+  window.addEventListener("resize", requestLayout);
+  // Web fonts swapping in after first paint can change each label's natural
+  // width enough to change the split.
+  window.addEventListener("load", requestLayout);
 })();
 
 // Cards gallery: let the mouse drag the horizontally scrolling row, since it

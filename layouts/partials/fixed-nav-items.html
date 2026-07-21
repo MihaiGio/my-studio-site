@@ -1,0 +1,27 @@
+{{/*
+  Renders the sticky nav's <a class="fn-item"> links. Factored out of
+  layouts/_default/index.html so the marquee track can render this exact
+  same list twice back-to-back (see the .fn-group comment in index.html) -
+  duplicating the loop inline there would drift out of sync with this one
+  over time.
+
+  Expects a dict with:
+    content - the $content page collection from index.html
+    page    - the current page (for .Params.nav_to_top_weight/_title)
+*/}}
+{{ $content := .content }}
+{{ $page := .page }}
+{{ if eq $page.Params.nav_to_top_weight "first" }}
+    {{ $fnav_title := "Start" }}{{ with $page.Params.nav_to_top_title }}{{ $fnav_title = . }}{{ end }}
+    <a class='fn-item' item_index='{{ 0 }}' href='./#site-head'>{{ $fnav_title | safeHTML }}</a>
+{{ end }}
+{{ $last_index_val := 0 }}
+{{ range $index_val, $elem_val := $content }}
+    {{ $fnav_title := .Title }}{{ with .Params.navigation_menu_title }}{{ $fnav_title = . }}{{ end }}
+    <a class='fn-item' item_index='{{ (add $index_val 1) }}' href='#{{ anchorize $fnav_title }}'>{{ $fnav_title | safeHTML }}</a>
+    {{ $last_index_val = $index_val }}
+{{ end }}
+{{ if eq $page.Params.nav_to_top_weight "last" }}
+    {{ $fnav_title := "Start" }}{{ with $page.Params.nav_to_top_title }}{{ $fnav_title = . }}{{ end }}
+    <a class='fn-item' item_index='{{ (add $last_index_val 2) }}' href='./#site-head'>{{ $fnav_title | safeHTML }}</a>
+{{ end }}

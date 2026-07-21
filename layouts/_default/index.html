@@ -122,23 +122,28 @@
 </header>
 
 <main class="content" role="main">
-    <!-- Render sticky left navigation menu -->
-    <div class='fixed-nav'>
-        {{ if eq .Params.nav_to_top_weight "first" }}
-            {{ $fnav_title := "Start" }}{{ with .Params.nav_to_top_title }}{{ $fnav_title = . }}{{ end }}
-            <a class='fn-item' item_index='{{ 0 }}' href='./#site-head'>{{ $fnav_title | safeHTML }}</a>
-        {{ end }}
-        {{ $last_index_val := 0 }}
-        {{ range $index_val, $elem_val := $content }}
-            {{ $fnav_title := .Title }}{{ with .Params.navigation_menu_title }}{{ $fnav_title = . }}{{ end }}
-            <a class='fn-item' item_index='{{ (add $index_val 1) }}' href='#{{ anchorize $fnav_title }}'>{{ $fnav_title | safeHTML }}</a>
-            {{ $last_index_val = $index_val }}
-        {{ end }}
-        {{ if eq .Params.nav_to_top_weight "last" }}
-            {{ $fnav_title := "Start" }}{{ with .Params.nav_to_top_title }}{{ $fnav_title = . }}{{ end }}
-            <a class='fn-item' item_index='{{ (add $last_index_val 2) }}' href='./#site-head'>{{ $fnav_title | safeHTML }}</a>
-        {{ end }}
+    <!-- Render sticky top navigation menu as one or two looping marquees.
+         The primary bar is pre-rendered here with the full item list (two
+         copies, for its own seamless loop) so the nav works even if the
+         split JS below never runs for some reason - static/js/custom.js
+         progressively enhances this by re-measuring each item's natural
+         (un-stretched) width and, only if some no longer fit their equal
+         share without truncating, moving the overflow onto the secondary
+         bar (which starts empty/hidden and loops the opposite direction).
+         See the fn-track/fn-group/fn-track-reverse rules in custom.css and
+         the nav-split IIFE in custom.js. -->
+    <div class='fixed-nav-wrapper'>
+        <div class='fixed-nav'>
+            <div class='fn-track'>
+                <div class='fn-group'>{{ partial "fixed-nav-items.html" (dict "content" $content "page" .) }}</div>
+                <div class='fn-group' aria-hidden='true'>{{ partial "fixed-nav-items.html" (dict "content" $content "page" .) }}</div>
+            </div>
+        </div>
+        <div class='fixed-nav fixed-nav-secondary fn-empty'>
+            <div class='fn-track fn-track-reverse'></div>
+        </div>
     </div>
+    <template id='fn-items-template'>{{ partial "fixed-nav-items.html" (dict "content" $content "page" .) }}</template>
 
     <!-- Render single-page content -->
     {{ range $index_val, $elem_val := $content }}
