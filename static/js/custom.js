@@ -186,6 +186,7 @@
     var img = document.createElement("img");
     img.src = imageBase + IMAGE_NAMES[Math.floor(Math.random() * IMAGE_NAMES.length)];
     img.alt = "";
+    img.decoding = "async";
     img.style.setProperty("--spin-duration", (MIN_SPIN_SECONDS + Math.random() * (MAX_SPIN_SECONDS - MIN_SPIN_SECONDS)) + "s");
     img.style.setProperty("--spin-direction", Math.random() < 0.5 ? -1 : 1);
     img.style.setProperty("--spin-delay", -(Math.random() * MAX_SPIN_SECONDS) + "s");
