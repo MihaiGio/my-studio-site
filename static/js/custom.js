@@ -316,25 +316,29 @@
   // once it moves away. Kept off-screen until the first real mousemove so
   // nothing gets nudged before the pointer is known to be over the page.
   //
-  // Skipped on touch devices (there's no mouse to collide with), but the
-  // bubble-vs-bubble collision below still runs everywhere - it's what keeps
-  // ambient and click-spawned images from overlapping regardless of device.
+  // The whole per-frame physics loop (this and the bubble-vs-bubble collision
+  // below) is skipped entirely on touch devices, not just the cursor push -
+  // there's no mouse to collide with, and on mobile CPUs the getBoundingClientRect
+  // reads plus the O(n^2) pairwise collision check on every animation frame is
+  // enough main-thread work to compete with touch scrolling and drop frames.
+  // Without it the images still fall/pulse/spin via pure CSS (no JS driving
+  // them), just without cursor-push or anti-overlap - occasional visual
+  // overlap on mobile is a fair trade for smooth scrolling.
   // (hasPointerFine itself is computed above, alongside the image-set choice.)
+  if (!hasPointerFine) return;
 
   var mouseX = -9999;
   var mouseY = -9999;
 
-  if (hasPointerFine) {
-    window.addEventListener("mousemove", function (e) {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-    }, { passive: true });
+  window.addEventListener("mousemove", function (e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }, { passive: true });
 
-    window.addEventListener("mouseleave", function () {
-      mouseX = -9999;
-      mouseY = -9999;
-    });
-  }
+  window.addEventListener("mouseleave", function () {
+    mouseX = -9999;
+    mouseY = -9999;
+  });
 
   function stepCollisions() {
     // Reads and writes are done in separate passes over `bubbles` -
@@ -363,20 +367,18 @@
       bubble._prevCy = bubble._cy;
     });
 
-    if (hasPointerFine) {
-      bubbles.forEach(function (bubble) {
-        var dx = bubble._cx - mouseX;
-        var dy = bubble._cy - mouseY;
-        var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-        var reach = COLLIDE_RADIUS + bubble._halfWidth;
+    bubbles.forEach(function (bubble) {
+      var dx = bubble._cx - mouseX;
+      var dy = bubble._cy - mouseY;
+      var dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+      var reach = COLLIDE_RADIUS + bubble._halfWidth;
 
-        if (dist < reach) {
-          var force = (1 - dist / reach) * COLLIDE_PUSH * (1 / 60);
-          bubble.velX += (dx / dist) * force;
-          bubble.velY += (dy / dist) * force;
-        }
-      });
-    }
+      if (dist < reach) {
+        var force = (1 - dist / reach) * COLLIDE_PUSH * (1 / 60);
+        bubble.velX += (dx / dist) * force;
+        bubble.velY += (dy / dist) * force;
+      }
+    });
 
     // Bubble-vs-bubble collision: treated as solid circles that never
     // overlap, resolved like a billiard-ball hit rather than a soft push -
