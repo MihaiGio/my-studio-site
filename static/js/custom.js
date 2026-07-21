@@ -157,6 +157,19 @@
     if (opts.immediate) {
       bubble.style.setProperty("--fall-delay", "0s");
       bubble.dataset.delaySet = "1";
+
+      // Click-spawned bubbles aren't part of the fixed ambient population, so
+      // without this they'd pile up in the DOM forever - one fall past the
+      // bottom of main.content (i.e. down to where the footer starts) and
+      // then despawn instead of looping.
+      bubble.classList.add("bubble--once");
+      bubble.addEventListener("animationend", function onFallEnd(e) {
+        if (e.animationName !== "bubble-fall") return;
+        bubble.removeEventListener("animationend", onFallEnd);
+        bubble.remove();
+        var idx = bubbles.indexOf(bubble);
+        if (idx !== -1) bubbles.splice(idx, 1);
+      });
     }
 
     field.appendChild(bubble);

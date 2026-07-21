@@ -443,6 +443,13 @@ main.content::after {
   animation-delay: var(--fall-delay, 0s);
 }
 
+/* Click-spawned bubbles (custom.js adds this class) fall once and get
+   removed on animationend instead of looping like the ambient ones. */
+.bubble-field .bubble.bubble--once {
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+
 .bubble-field .bubble-dot {
   position: absolute;
   inset: 0;
