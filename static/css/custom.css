@@ -30,8 +30,33 @@
   display: block;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   fill: currentColor;
   filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.15));
+}
+
+/* Two copies of the drip path sit side by side (see the project-level
+   layouts/_default/index.html override) and this track slides left by
+   exactly one copy's width (1440 user units, matching the viewBox), so the
+   second copy lines up perfectly where the first started and the loop
+   point is invisible. */
+.post-after-wave-track {
+  animation: post-after-wave-flow 18s linear infinite;
+}
+
+@keyframes post-after-wave-flow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-1440px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .post-after-wave-track {
+    animation: none;
+  }
 }
 
 /* ===== Custom pointer =====
