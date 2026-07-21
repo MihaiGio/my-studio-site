@@ -77,8 +77,11 @@ body {
   --cover-title-and-description-guard-bg-color: rgba(119, 0, 255, 0.5);
   --cover-title-text-shadow: #7700FF 0px 0px 7px;
 
-  /* Sticky nav menu */
-  --sticky-menu-text-color: #FF1493;
+  /* Sticky nav menu - text color for hover/active items and mark/link
+     highlights sitewide. Kept equal to --highlight-inverse (yellow) so it
+     still contrasts against the nav bar's pink background (see .fixed-nav
+     below) instead of disappearing against it. */
+  --sticky-menu-text-color: var(--highlight-inverse);
 
   /* Alternating content sections */
   --section-light-text-color: #2b0057;
@@ -97,6 +100,23 @@ body {
   /* Footer */
   --footer-color-background: #7700FF;
   --footer-color: #FFFF00;
+}
+
+/* Landing-page buttons (a.btn / .btn-lang) default to the theme's
+   --highlight (pink) with --highlight-inverse (yellow) only on hover -
+   swapped here so the buttons themselves read yellow, with pink reserved
+   for hover and for the nav bar (see .fixed-nav below). */
+a.btn,
+#site-languages .btn-lang {
+  background-color: var(--highlight-inverse);
+  color: var(--highlight-inverse-contrast);
+}
+
+a.btn:hover,
+#site-languages .btn-lang:hover,
+#site-languages .btn-lang.active {
+  background-color: var(--highlight);
+  color: var(--highlight-contrast);
 }
 
 /* Page scrollbar, recolored to match the site's palette instead of the
@@ -170,6 +190,9 @@ html {
   border-radius: 0;
   text-align: center;
   padding: 4px 0;
+  /* Overrides the theme's own --section-light-bg-color (yellow) background
+     with the palette's pink instead. */
+  background-color: var(--highlight);
   transition: background-color 0.4s ease;
   /* The track underneath is twice as wide as the bar and scrolls past -
      this clips it to exactly the bar's own width. */
