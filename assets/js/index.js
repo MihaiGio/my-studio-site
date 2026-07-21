@@ -2,14 +2,21 @@
  * Main JS file for GhostScroll behaviours
  *
  * Project-level override of themes/hugo-scroll/assets/js/index.js (Hugo's
- * asset mounts resolve resources.Get "js/index.js" here first). Only change
- * vs. the theme original: the post-after wave divider's fadeOut/fadeIn calls
- * now stop() any in-flight/queued animation first. Without it, the
- * continuous scroll handler queues a fadeOut/fadeIn on every scroll tick;
- * jQuery plays queued animations one at a time, so a fast scroll down piles
- * up dozens of queued fadeOut calls, and reversing direction (scrolling up)
- * queues its fadeIn behind all of them - the divider stays hidden for
- * seconds because it's waiting for a backlog that's already visually done.
+ * asset mounts resolve resources.Get "js/index.js" here first). Changes vs.
+ * the theme original:
+ * - The post-after wave divider's fadeOut/fadeIn calls now stop() any
+ *   in-flight/queued animation first. Without it, the continuous scroll
+ *   handler queues a fadeOut/fadeIn on every scroll tick; jQuery plays
+ *   queued animations one at a time, so a fast scroll down piles up dozens
+ *   of queued fadeOut calls, and reversing direction (scrolling up) queues
+ *   its fadeIn behind all of them - the divider stays hidden for seconds
+ *   because it's waiting for a backlog that's already visually done.
+ * - The scroll handler's body (several jQuery .offset()/.height() calls,
+ *   each a forced synchronous layout) now runs at most once per animation
+ *   frame instead of once per native "scroll" event. Touch scrolling fires
+ *   scroll events far more often than the screen repaints, so without this
+ *   throttle the handler was doing many times more forced-layout work than
+ *   it needed to - visible as stutter while scrolling on mobile.
  */
 
 var $post = $(".post");
@@ -58,7 +65,10 @@ var $sitehead = $("#site-head");
     $(".post.last").next(".post-after").hide();
 
     if ($sitehead.length) {
-      $(window).scroll(function () {
+      var scrollTicking = false;
+
+      function handleScroll() {
+        scrollTicking = false;
         var w = $(window).scrollTop();
         var g = $sitehead.offset().top;
         var h = $sitehead.offset().top + $sitehead.height() - 100;
@@ -95,6 +105,13 @@ var $sitehead = $("#site-head");
             }
         }
         });
+      }
+
+      $(window).on("scroll", function () {
+        if (!scrollTicking) {
+          scrollTicking = true;
+          requestAnimationFrame(handleScroll);
+        }
       });
     }
 

@@ -293,6 +293,16 @@
   // and get shoved off their straight fall path around it, then spring back
   // once it moves away. Kept off-screen until the first real mousemove so
   // nothing gets nudged before the pointer is known to be over the page.
+  //
+  // Skipped entirely on touch devices: there's no mouse to collide with,
+  // so stepCollisions would just spend a getBoundingClientRect() layout
+  // read on every one of the 30 bubbles, every frame, forever, for zero
+  // visible effect - a steady drain that was showing up as stutter on
+  // mobile.
+  if (!window.matchMedia || !window.matchMedia("(pointer: fine)").matches) {
+    return;
+  }
+
   var mouseX = -9999;
   var mouseY = -9999;
 
