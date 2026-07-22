@@ -2,6 +2,7 @@
 title: "Contact"
 weight: 7
 header_menu: true
+anchor_id: "contact"
 ---
 
 {{<contact_list>}}

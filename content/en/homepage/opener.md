@@ -1,6 +1,7 @@
 ---
 title: "Welcome"
 weight: 1
+anchor_id: "welcome"
 ---
 
 ![Melona](/images/drawings/melona.png)

@@ -109,13 +109,15 @@
                  <a class='btn site-menu' href='{{ .Params.detailed_page_path | relLangURL }}'>{{ $button_title }}</a>
               {{ else }}
                 {{ $fnav_title := .Title }}{{ with .Params.navigation_menu_title }}{{ $fnav_title = . }}{{ end }}
-                 <a class='btn site-menu' data-title-anchor='{{ anchorize $fnav_title }}' href='#{{ anchorize $fnav_title }}'>{{ $button_title }}</a>
+                {{ $anchor_id := anchorize $fnav_title }}{{ with .Params.anchor_id }}{{ $anchor_id = . }}{{ end }}
+                 <a class='btn site-menu' data-title-anchor='{{ $anchor_id }}' href='#{{ $anchor_id }}'>{{ $button_title }}</a>
               {{ end }}
             {{ end }}
 
             {{ with (index $content 0) }}
                 {{ $first_title := .Title }}{{ with .Params.navigation_menu_title }}{{ $first_title = . }}{{ end }}
-                <a id='header-arrow' href="#{{- anchorize $first_title -}}" aria-label="Go to first section"><i class="fa fa-angle-down"></i></a>
+                {{ $first_anchor_id := anchorize $first_title }}{{ with .Params.anchor_id }}{{ $first_anchor_id = . }}{{ end }}
+                <a id='header-arrow' href="#{{- $first_anchor_id -}}" aria-label="Go to first section"><i class="fa fa-angle-down"></i></a>
             {{ end }}
         </div>
     </div>
@@ -149,8 +151,9 @@
     {{ range $index_val, $elem_val := $content }}
         {{ if .Title }}
         {{ $fnav_title := .Title }}{{ with .Params.navigation_menu_title }}{{ $fnav_title = . }}{{ end }}
+        {{ $anchor_id := anchorize $fnav_title }}{{ with .Params.anchor_id }}{{ $anchor_id = . }}{{ end }}
         <div class='post-holder{{ if and (ne .Site.Params.invertSectionColors true) (not (modBool $index_val 2)) }} dark{{ else if and (eq .Site.Params.invertSectionColors true) (modBool $index_val 2) }} dark{{ end }}'>
-            <article id='{{ anchorize $fnav_title }}' class='post {{ if eq $index_val 0 }}first{{ end }} {{ if eq (add $index_val 1) (len $content) }}last{{ end }}'>
+            <article id='{{ $anchor_id }}' class='post {{ if eq $index_val 0 }}first{{ end }} {{ if eq (add $index_val 1) (len $content) }}last{{ end }}'>
                 <header class="post-header">
                     <h2 class="post-title">{{ .Title | emojify | safeHTML }}</h2>
                 </header>

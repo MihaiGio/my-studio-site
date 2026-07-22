@@ -48,3 +48,8 @@ icon = "fa-brands fa-github"
 weight = 10
 languageName = "English"
 contentDir = "content/en"
+
+[languages.ro]
+weight = 20
+languageName = "Română"
+contentDir = "content/ro"

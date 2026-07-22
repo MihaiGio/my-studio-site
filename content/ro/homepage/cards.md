@@ -1,11 +1,11 @@
 ---
-title: "Cards"
+title: "Cărți"
 weight: 6
 header_menu: true
 anchor_id: "cards"
 ---
 
-Browse the full card gallery below.
+Răsfoiți mai jos întreaga galerie de cărți.
 
 ![Plod unit card](/images/cards/Card_Unit_Plod.png)
 ![Pineapple unit card](/images/cards/Card_Unit_Pineapple.png)

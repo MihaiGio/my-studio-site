@@ -2,6 +2,7 @@
 title: "About Us"
 weight: 2
 header_menu: true
+anchor_id: "about-us"
 ---
 
 ![Character concept art](/images/drawings/Pear.png)

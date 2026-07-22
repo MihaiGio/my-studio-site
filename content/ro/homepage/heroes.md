@@ -1,11 +1,11 @@
 ---
-title: "Heroes"
+title: "Eroi"
 weight: 4
 header_menu: true
 anchor_id: "heroes"
 ---
 
-Meet the heroes, standing side by side.
+Cunoașteți eroii, umăr la umăr.
 
 ![Spear fighter hero](/images/heroes/spearpng.png)
 ![Pineapple brawler hero](/images/heroes/5.png)

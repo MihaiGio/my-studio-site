@@ -1,11 +1,11 @@
 ---
-title: "Enemies"
+title: "Inamici"
 weight: 5
 header_menu: true
 anchor_id: "enemies"
 ---
 
-Meet the enemies, closing in together.
+Cunoașteți inamicii, apropiindu-se împreună.
 
 ![Cherry twins enemy](/images/enemies/Cherryes.png)
 ![Pumpkin tank enemy](/images/enemies/pumtank1.png)

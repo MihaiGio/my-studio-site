@@ -2,6 +2,7 @@
 title: "Rottenlands"
 weight: 3
 header_menu: true
+anchor_id: "rottenlands"
 ---
 
 ![Rottenlands guardian concept art](/images/drawings/Spear2.png)
