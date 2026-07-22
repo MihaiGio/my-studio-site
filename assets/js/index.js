@@ -84,7 +84,6 @@ var $sitehead = $("#site-head");
       // forced synchronous layout) instead of on every scroll tick.
       function measureScrollMetrics() {
         var headTop = $sitehead.offset().top;
-        var lastItem = $(".fn-item[item_index='" + $postholder.length + "']");
 
         var posts = $post.map(function () {
           var $this = $(this);
@@ -93,7 +92,16 @@ var $sitehead = $("#site-head");
           return {
             top: top,
             bottom: top + $this.height(),
-            item: $(".fn-item[item_index='" + $holder.index() + "']"),
+            // The item_index value, not a resolved element - resolved fresh
+            // in handleScroll() every time it's applied (see the comment
+            // there for why). Position among .post-holder siblings only
+            // (matching layouts/partials/fixed-nav-items.html's index_val),
+            // not plain .index() - .fixed-nav-wrapper and the #fn-items-
+            // template element both sit before the post-holders in
+            // layouts/_default/index.html, so unfiltered .index() is 2
+            // higher than the section's actual position and every post
+            // pointed at the next section's nav item instead of its own.
+            itemIndex: $holder.index(".post-holder") + 1,
             wave: $holder.prev(".post-holder").find(".post-after"),
           };
         }).get();
@@ -102,7 +110,7 @@ var $sitehead = $("#site-head");
           headTop: headTop,
           headBottom: headTop + $sitehead.height() - 100,
           footerHeight: $(".site-footer").height(),
-          lastItem: lastItem,
+          lastItemIndex: $postholder.length,
           posts: posts,
         };
       }
@@ -119,19 +127,48 @@ var $sitehead = $("#site-head");
           $(".fixed-nav").stop(true, true).css("display", "flex").fadeIn("fast");
         }
 
+        // ".fn-item[item_index=...]" is looked up fresh here rather than
+        // cached in measureScrollMetrics() so this always reaches every
+        // matching item currently in the DOM - both duplicate copies in the
+        // primary bar's loop AND, on narrow screens, the secondary
+        // overflow bar's copies (see the .fn-track comment in custom.css
+        // and the nav-split IIFE in static/js/custom.js). That split
+        // rebuilds both bars' item nodes from scratch on resize/load, which
+        // would silently orphan any element reference cached earlier - a
+        // cached reference stops matching what's on screen, so "active"
+        // never reaches the replacement nodes.
         if (($(window).height() + w) > ($(document).height() - scrollMetrics.footerHeight)) {
           $(".fn-item").removeClass("active");
-          scrollMetrics.lastItem.addClass("active");
+          $(".fn-item[item_index='" + scrollMetrics.lastItemIndex + "']").addClass("active");
         } else {
+          var viewportBottom = w + $(window).height();
+
+          // The active section is whichever post currently covers the most
+          // of the viewport - not just whichever post the viewport's top
+          // edge happens to be inside - so a post shorter than the viewport,
+          // or one the user has scrolled mostly past, loses "active" to
+          // whatever's actually dominant on screen right now.
+          var activeItemIndex = null;
+          var bestVisible = 0;
+
           scrollMetrics.posts.forEach(function (p) {
+            var visible = Math.min(viewportBottom, p.bottom) - Math.max(w, p.top);
+            if (visible > bestVisible) {
+              bestVisible = visible;
+              activeItemIndex = p.itemIndex;
+            }
+
             if (w >= p.top && w <= p.bottom) {
-              p.item.addClass("active");
               p.wave.stop(true, true).fadeOut("slow");
             } else {
-              p.item.removeClass("active");
               p.wave.stop(true, true).fadeIn("slow");
             }
           });
+
+          $(".fn-item").removeClass("active");
+          if (activeItemIndex !== null) {
+            $(".fn-item[item_index='" + activeItemIndex + "']").addClass("active");
+          }
         }
       }
 
